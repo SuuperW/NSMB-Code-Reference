@@ -6,7 +6,7 @@
 class BlendColor
 {
 
-	using rgb_t = struct {
+	using rgb_t = struct rgb_t {
 
 		u16 r, g, b;
 

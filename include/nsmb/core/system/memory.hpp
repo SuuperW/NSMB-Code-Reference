@@ -126,9 +126,9 @@ public:
 	FrameHeap(void* start, u32 size, Heap* parent, NNSFndHeapHandle allocator);
 	virtual ~FrameHeap();
 
-	virtual void vLockMutex();
-	virtual void vUnlockMutex();
-	virtual bool vTryLockMutex();
+	virtual void vLockMutex() override;
+	virtual void vUnlockMutex() override;
+	virtual bool vTryLockMutex() override;
 	virtual void vDestroy() override;
 	virtual void* vAllocate(u32 size, s32 align) override;
 	virtual void vDeallocate(void* ptr) override;							//Calls OS_Panic if ptr is non-null. If not, it has no effect.
