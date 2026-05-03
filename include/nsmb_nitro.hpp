@@ -58,15 +58,18 @@
 #define NTR_WEAK				[[gnu::weak]]
 #define NTR_NAKED				[[gnu::naked]]
 #define NTR_USED				[[gnu::used]]
+#ifdef __clang__
+#define NTR_LONGCALL
+#else
 #define NTR_LONGCALL			[[gnu::long_call]]
+#endif
 #define NTR_THUMB				[[gnu::target("thumb")]]
 #define NTR_ARM					[[gnu::target("arm")]]
 #define NTR_WARNING(msg)		[[gnu::warning(msg)]]
 #define NTR_ERROR(msg)			[[gnu::error(msg)]]
 #define NTR_ALIAS(sym)			[[gnu::alias(sym)]]
 #define NTR_WEAKREF(sym)		[[gnu::weakref(sym)]]
-#define NTR_COPY(sym)			[[gnu::copy(sym)]]
-#define NTR_FORMAT(fun, a, b)	[[gnu::format(func, a, b)]]
+#define NTR_FORMAT(fun, a, b)	[[gnu::format(fun, a, b)]]
 #define NTR_FALLTHROUGH			[[fallthrough]]
 #define NTR_NORETURN			[[noreturn]]
 #define NTR_NODISC				[[nodiscard]]
@@ -95,7 +98,7 @@ NTR_FORMAT(printf, 2, 3) int OS_SPrintf(char *dst, const char *fmt, ...);
 // ERROR #1: (with NTR_INLINE) This can never be inlined because it has variable arguments
 // ERROR #2: (without NTR_INLINE) Multiple definitions of OS_SNPrintf...
 // ok GCC
-NTR_FORMAT(printf, 2, 3) inline int OS_SNPrintf(char* dst, size_t len, const char* fmt, ...) {
+NTR_FORMAT(printf, 3, 4) inline int OS_SNPrintf(char* dst, size_t len, const char* fmt, ...) {
 
 	va_list vl;
 	va_start(vl, fmt);

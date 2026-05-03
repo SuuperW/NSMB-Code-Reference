@@ -11,7 +11,7 @@ public:
 	static constexpr u16 JumpTriggerBoost	= 1;
 	static constexpr u16 JumpTriggerNormal	= 2;
 
-	static constexpr fx32 JumpVelocity = 2.8125fx;
+	static constexpr fx32 JumpVelocity = fx32(2.8125);
 
 	using StateFunction = bool(Trampoline::*)();
 

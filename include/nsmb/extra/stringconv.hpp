@@ -24,7 +24,7 @@ namespace StringConv {
 
 		const char* chars = upper ? UpperChars : LowerChars;
 
-		for (count; count < Size; count++) {
+		for (; count < Size; count++) {
 
 			buffer[count] = chars[n % base];
 			n /= base;

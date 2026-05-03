@@ -21,7 +21,7 @@ struct __ntr {
 
 #endif
 
-	NTR_COPY(OS_Terminate) NTR_FORMAT(printf, 4, 5) static void terminate(const char* file, const char* function, int line, const char* fmt, ...)
+	NTR_FORMAT(printf, 4, 5) __attribute__((noreturn)) static void terminate(const char* file, const char* function, int line, const char* fmt, ...)
 #ifndef NTR_DEBUG
 	asm("OS_Terminate");
 #else
@@ -92,6 +92,8 @@ static constexpr void __ntr_assert_constexpr(bool condition) {
 
 #ifdef NTR_DEBUG
 	#define __NTR_ASSERT_IMPL(cond, fmt, ...) ::__ntr::assert(!!(cond), __FILE__, __PRETTY_FUNCTION__, __LINE__, fmt __VA_OPT__(,) __VA_ARGS__)
+#elif __clang__
+	#define __NTR_ASSERT_IMPL(cond, fmt, ...) __builtin_assume(cond)
 #else
 	#define __NTR_ASSERT_IMPL(cond, fmt, ...) [[assume(cond)]]
 #endif

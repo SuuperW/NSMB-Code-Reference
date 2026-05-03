@@ -22,11 +22,11 @@ namespace Math { // TODO Global cleanup
 		return value ? --value : value;
 	}
 
-	template<> s32 Math::tick(s32& value);
-	template<> u16 Math::tick(u16& value);
-	template<> s16 Math::tick(s16& value);
-	template<> u8 Math::tick(u8& value);
-	template<> s8 Math::tick(s8& value);
+	template<> s32 tick(s32& value);
+	template<> u16 tick(u16& value);
+	template<> s16 tick(s16& value);
+	template<> u8 tick(u8& value);
+	template<> s8 tick(s8& value);
 
 	template<CC::Integer I>
 	NTR_INLINE bool stepFx(I& value, I target, I step) {
@@ -268,20 +268,17 @@ namespace Math { // TODO Global cleanup
 
 	constexpr fx32 smoothstep(fx32 start, fx32 end, fx32 step) {
 
-		step = clamp(step, 0, 1.0fx);
+		step = clamp(step, 0, 1.0_fx);
 
-		step = mul(mul(mul(-2.0fx, step), step), step) + mul(mul(3.0fx, step), step);
+		step = mul(mul(mul(-2.0_fx, step), step), step) + mul(mul(3.0_fx, step), step);
 
-		return mul(end, step) + mul(start, (1.0fx - step));
+		return mul(end, step) + mul(start, (1.0_fx - step));
 
 	}
 
 }
 
-PP_DIAGNOSTIC_PUSH()
-PP_DIAGNOSTIC_IGNORE("-Wliteral-suffix")
-
-consteval s32 operator""rad(long double r) {
+consteval s32 operator"" _rad(long double r) {
 
 	constexpr long double TwoPi = 6.28318530718;
 
@@ -295,12 +292,10 @@ consteval s32 operator""rad(long double r) {
 
 }
 
-consteval s32 operator""deg(long double d) {
+consteval s32 operator"" _deg(long double d) {
 	return Math::cdeg(d);
 }
 
-consteval s32 operator""deg(unsigned long long d) {
+consteval s32 operator"" _deg(unsigned long long d) {
 	return Math::cdeg(d);
 }
-
-PP_DIAGNOSTIC_POP()

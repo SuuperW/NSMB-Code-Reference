@@ -162,9 +162,9 @@ public:
 	static constexpr Vec2 RenderSize = { 16, 32 };
 
 	// 020dfb88, 020dfc98
-	static constexpr fx32 FallAccel = -0.1875fx; // vertical acceleration when falling
+	static constexpr fx32 FallAccel = fx32(-0.1875); // vertical acceleration when falling
 	// 020df688, 020dfca8
-	static constexpr fx32 FallTargetVelY = -4.0fx;
+	static constexpr fx32 FallTargetVelY = fx32(-4.0);
 	// 020dfb8c
 	static constexpr u16 InShellLength = 511; // number of frames Koopa will spend inside shell before exiting; 8.5 seconds + 1 frame
 	// 020de1f4

@@ -589,7 +589,7 @@ public:
 	static constexpr u16 UpdatePriority = ObjectID;
 	static constexpr u16 RenderPriority = 28;
 
-	static constexpr fx32 modelScaleFactor = 0.9fx;
+	static constexpr fx32 modelScaleFactor = fx32(0.9);
 
 	static const ActorProfile profile;
 

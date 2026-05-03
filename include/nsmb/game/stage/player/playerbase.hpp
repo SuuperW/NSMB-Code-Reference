@@ -586,9 +586,9 @@ public:
 
 	}
 
-	static constexpr fx32 maxWalkSpeedJumpModifier = 0.28125fx; // 021146B8 (ov10)
-	static constexpr fx32 miniJumpFactor = 0.8125fx; // 021146FC (ov10)
-	static constexpr fx32 highJumpFactor = 0.84375fx; // 02114738 (ov10)
+	static constexpr fx32 maxWalkSpeedJumpModifier = fx32(0.28125); // 021146B8 (ov10)
+	static constexpr fx32 miniJumpFactor = fx32(0.8125); // 021146FC (ov10)
+	static constexpr fx32 highJumpFactor = fx32(0.84375); // 02114738 (ov10)
 
 	static const s16 ropeDirectionalRotationY[2];
 	static const s16 megaDirectionalRotationY[2];

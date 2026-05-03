@@ -352,6 +352,7 @@ namespace End {
 			case L' ':	return 0x68;
 			case L'\0':	return 0x69;
 		}
+		return 0xFF;
 	}
 
 	constexpr wchar_t indexConv(CharT index) {
@@ -463,6 +464,7 @@ namespace End {
 			case 0x68: return L' ';
 			case 0x69: return L'\0';
 		}
+		return 0xFF;
 	}
 
 	template<size_t N>
@@ -510,34 +512,29 @@ namespace End {
 }
 
 
-PP_DIAGNOSTIC_PUSH()
-PP_DIAGNOSTIC_IGNORE("-Wliteral-suffix")
-
-consteval End::CharT operator""end(char c) {
+consteval End::CharT operator"" _end(char c) {
 	return End::charConv(c);
 }
 
-consteval End::CharT operator""end(wchar_t c) {
+consteval End::CharT operator"" _end(wchar_t c) {
 	return End::charConv(c);
 }
 
 #ifdef __INTELLISENSE__ // Intellisense does not support templated literal operators
 
-consteval const End::CharT* operator""end(const char* str, size_t size) {
+consteval const End::CharT* operator"" _end(const char* str, size_t size) {
 	return {};
 }
 
-consteval const End::CharT* operator""end(const wchar_t* str, size_t size) {
+consteval const End::CharT* operator"" _end(const wchar_t* str, size_t size) {
 	return {};
 }
 
 #else // Actual implementation
 
 template<End::StringHelper Str>
-consteval const End::CharT* operator""end() {
+consteval const End::CharT* operator"" _end() {
 	return Str;
 }
 
 #endif
-
-PP_DIAGNOSTIC_POP()

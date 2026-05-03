@@ -95,7 +95,7 @@ public:
 	    currentAcConfig = {
 
 	        0, 0,
-	        12.0fx, 12.0fx,
+	        fx32(12.0), fx32(12.0),
 
 	        AcGroup::Chasing,
 	        AcAttack::None,

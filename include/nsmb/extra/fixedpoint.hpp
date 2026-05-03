@@ -64,11 +64,11 @@ public:
 	static constexpr SizeT FractionBits = Fract;
 	static constexpr SizeT Shift = Fract;
 
-	static constexpr FixedPoint Min = FixedPoint(-1);
-	static constexpr FixedPoint Max = FixedPoint(Bits::ones<I>(Bits::bitCount<I>() - 1));
+	static const FixedPoint Min;
+	static const FixedPoint Max;
 
-	static constexpr FixedPoint One = FixedPoint(1ULL << Shift);
-	static constexpr FixedPoint Half = One / 2;
+	static const FixedPoint One;
+	static const FixedPoint Half;
 
 
 	constexpr FixedPoint() : i(0) {}
@@ -77,7 +77,7 @@ public:
 	constexpr explicit FixedPoint(J j) : i(j) {}
 
 	template<CC::Float F>
-	consteval FixedPoint(F f) : i(One.raw() * f + F(0.5)) {} // TODO Avoid dupe with set
+	constexpr FixedPoint(F f) : i(One.raw() * f + F(0.5)) {} // TODO Avoid dupe with set
 
 	template<CC::Fixed F>
 	constexpr explicit FixedPoint(F x) : i(0) { set(x); }
@@ -538,6 +538,17 @@ NTR_SIZE_GUARD(Fx32, sizeof(typename Fx32::IntegerT));
 NTR_SIZE_GUARD(Fx64, sizeof(typename Fx64::IntegerT));
 NTR_SIZE_GUARD(Fx64c, sizeof(typename Fx64c::IntegerT));
 
+template<CC::SignedInteger I, SizeT Fract> requires (Fract < Bits::bitCount<I>() && Fract != 0)
+constexpr FixedPoint<I, Fract> FixedPoint<I, Fract>::Min(-1);
+
+template<CC::SignedInteger I, SizeT Fract> requires (Fract < Bits::bitCount<I>() && Fract != 0)
+constexpr FixedPoint<I, Fract> FixedPoint<I, Fract>::Min(Bits::ones<I>(Bits::bitCount<I>() - 1));
+
+template<CC::SignedInteger I, SizeT Fract> requires (Fract < Bits::bitCount<I>() && Fract != 0)
+constexpr FixedPoint<I, Fract> FixedPoint<I, Fract>::One(1ULL << Shift);
+
+template<CC::SignedInteger I, SizeT Fract> requires (Fract < Bits::bitCount<I>() && Fract != 0)
+constexpr FixedPoint<I, Fract> FixedPoint<I, Fract>::Half(FixedPoint<I, Fract>::One / 2);
 
 template<CC::Fixed F, CC::Integer J>
 constexpr F operator+(F a, J b) {
@@ -647,39 +658,34 @@ constexpr F operator^(T a, F b) {
 }
 
 
-PP_DIAGNOSTIC_PUSH()
-PP_DIAGNOSTIC_IGNORE("-Wliteral-suffix")
-
-consteval Fx16 operator""fxs(unsigned long long value) {
+constexpr Fx16 operator"" _fxs(unsigned long long value) {
 	return Fx16::One * value;
 }
 
-consteval Fx32 operator""fx(unsigned long long value) {
+constexpr Fx32 operator"" _fx(unsigned long long value) {
 	return Fx32::One * value;
 }
 
-consteval Fx64 operator""fxl(unsigned long long value)	{
+constexpr Fx64 operator"" _fxl(unsigned long long value)	{
 	return Fx64::One * value;
 }
 
-consteval Fx64c operator""fxlc(unsigned long long value) {
+constexpr Fx64c operator"" _fxlc(unsigned long long value) {
 	return Fx64c::One * value;
 }
 
-consteval Fx16 operator""fxs(long double value)	{
+constexpr Fx16 operator"" _fxs(long double value)	{
 	return Fx16(value);
 }
 
-consteval Fx32 operator""fx(long double value) {
+constexpr Fx32 operator"" _fx(long double value) {
 	return Fx32(value);
 }
 
-consteval Fx64 operator""fxl(long double value)	{
+constexpr Fx64 operator"" _fxl(long double value)	{
 	return Fx64(value);
 }
 
-consteval Fx64c operator""fxlc(long double value) {
+constexpr Fx64c operator"" _fxlc(long double value) {
 	return Fx64c(value);
 }
-
-PP_DIAGNOSTIC_POP()
