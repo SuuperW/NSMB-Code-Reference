@@ -9,6 +9,9 @@
 /include/nitro.h
 /include/nnsys.h
 
+# Python
+**/__pycache__/**
+
 # Misc
 /dev/
 *.bak
@@ -28,3 +31,6 @@
 !logo.png
 !symbols7.x
 !symbols9.x
+!fake_nitro
+!PyGhidra
+!for_ghidra.h
