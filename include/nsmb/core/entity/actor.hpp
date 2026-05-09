@@ -61,7 +61,7 @@ public:
 	fx32 accelV;
 	fx32 targetVelV;
 	fx32 accelH;
-	u32 unkC4;
+	u32 unkC8;
 	Vec3 velocity;
 	Vec3 targetVelocity;
 	Vec3 scale;
