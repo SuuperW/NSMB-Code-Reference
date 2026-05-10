@@ -156,6 +156,15 @@ class ClassInfo:
 		
 		self._vtable_methods = virtual_methods
 		return virtual_methods
+	
+	def get_vtable_owner_name(self) -> str | None:
+		if len(self.vtable_methods()) != 0:
+			return self.name
+		for sub in self.subclasses:
+			so = sub.get_vtable_owner_name()
+			if so is not None:
+				return so
+		return None
 
 class VarInfo:
 	name: str

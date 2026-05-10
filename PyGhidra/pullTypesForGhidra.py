@@ -422,29 +422,46 @@ def create_listing_function(fi: FunctionInfo):
 	if not found_any and not fi.is_maybe_inline:
 		print(f'function {fi.name} mangled to {fi.mangled_name} and has no link location')
 
-def make_var(vi: VarInfo):
-	if vi.is_constexpr:
-		return
-	
-	mangled_name = vi.mangled_name
+def make_var(mangled_name: str, plain_name: str, is_class_member: bool, ghidra_type: Structure):
 	if mangled_name in symbols_arm9:
 		address = symbols_arm9[mangled_name]
-		del symbols_arm9[mangled_name]
 
 		symbol = symbol_table.getPrimarySymbol(address)
-		space, sname = get_namespace_for(vi.name, vi.class_member)
+		space, sname = get_namespace_for(plain_name, is_class_member)
 		if symbol:
+			if sname == symbol.getName():
+				return # symbol updater: we expect to get this
 			symbol.setNameAndNamespace(sname, space, SourceType.USER_DEFINED)
 		else:
 			symbol_table.createLabel(address, sname, space, SourceType.USER_DEFINED)
-		dt = get_ghidra_type(vi.clang_type)
-		if dt.getLength() < 0:
-			print(f'skipping symbol {vi.name} because the type {vi.clang_type.spelling} is incomplete')
+		if ghidra_type.getLength() < 0:
+			print(f'skipping symbol {plain_name} because the type {ghidra_type.getName()} is incomplete')
 			return
-		listing.clearCodeUnits(address, address.add(dt.getLength()), False)
-		listing.createData(address, dt)
+		listing.clearCodeUnits(address, address.add(ghidra_type.getLength()), False)
+		listing.createData(address, ghidra_type)
 	else:
-		print(f'variable {vi.name} mangled to {mangled_name} and has no link location')
+		print(f'variable {plain_name} mangled to {mangled_name} and has no link location')
+
+def make_var_vi(vi: VarInfo):
+	if vi.is_constexpr:
+		return
+	make_var(vi.mangled_name, vi.name, vi.class_member, get_ghidra_type(vi.clang_type))
+
+def make_vtable_symbol(ci: ClassInfo):
+	owner_name = ci.get_vtable_owner_name()
+	if owner_name is None:
+		return
+	vtable_mangled_name: str
+	if '::' in ci.name:
+		parts = ci.name.split('::')
+		parts = [f'{len(p)}{p}' for p in parts]
+		vtable_mangled_name = f'_ZTVN{str.join('', parts)}E'
+	else:
+		vtable_mangled_name = f'_ZTV{len(ci.name)}{ci.name}'
+	plain_name = f'{ci.name}::vtable'
+	owner_name = owner_name.replace('::', '/')
+	ghidra_vtable = type_manager.getDataType(f'/{owner_name}/vtable')
+	make_var(vtable_mangled_name, plain_name, True, ghidra_vtable)
 
 def main():
 	print('parsing header files...')
@@ -525,13 +542,14 @@ def main():
 	for name in parse_results.classes:
 		for method in parse_results.classes[name].methods:
 			create_listing_function(method)
+		make_vtable_symbol(parse_results.classes[name])
 	# static functions
 	for name in parse_results.function_defs:
 		create_listing_function(parse_results.function_defs[name])
 		
 	# Step 4: Static variables
 	for name in parse_results.static_vars:
-		make_var(parse_results.static_vars[name])
+		make_var_vi(parse_results.static_vars[name])
 
 	if len(symbols_arm9) != 0:
 		print('Unused symbols for arm9:')
