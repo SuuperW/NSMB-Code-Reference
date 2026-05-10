@@ -392,8 +392,12 @@ class ParseResults:
 					self.collect_type(child.type)
 				ci.add_subclass(self.classes[sub_name])
 			elif child.kind in (CursorKind.CXX_METHOD, CursorKind.CONSTRUCTOR, CursorKind.DESTRUCTOR, CursorKind.CONVERSION_FUNCTION):
-				if not child.is_deleted_method() and not child.is_pure_virtual_method():
+				pure_virtual = child.is_pure_virtual_method()
+				if not child.is_deleted_method() and not pure_virtual:
 					self.collect_function_info(child, ci)
+				elif pure_virtual:
+					fi = FunctionInfo(ci.name, child)
+					ci.add_method(fi)
 			elif child.kind == CursorKind.VAR_DECL:
 				self.collect_var_or_field(child, ci.name)
 			elif child.kind in collectable_type_declarations:
