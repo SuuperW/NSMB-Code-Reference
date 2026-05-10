@@ -363,11 +363,7 @@ def _create_listing_function(fi: FunctionInfo, address: Address):
 	else:
 		func.setCallingConvention(CompilerSpec.CALLING_CONVENTION_default)
 	func.setParentNamespace(parent_namespace)
-	try:
-		func.setReturnType(get_ghidra_type(fi.clang_type.get_result()), SourceType.USER_DEFINED)
-	except Exception as e:
-		print(f'{fi.name} {hex(address.getOffset())} {get_friendly_name(fi.clang_type.get_result())}')
-		raise e
+	func.setReturnType(get_ghidra_type(fi.clang_type.get_result()), SourceType.USER_DEFINED)
 
 	# Function parameters are hard. Because Ghidra thinks registers should not be used for >4 byte params.
 	# And when any params have custom storage, all of them have to.
@@ -420,12 +416,8 @@ def create_listing_function(fi: FunctionInfo):
 	for mangled_name in mangled_names:
 		if mangled_name in symbols_arm9:
 			address = symbols_arm9[mangled_name]
-			if int(address.getOffset()) == 0x02044B20:
-				print(fi.name, fi.mangled_name, hex(int(address.getOffset())))
 			del symbols_arm9[mangled_name]
 			_create_listing_function(fi, address)
-			if fi.mangled_name == '_ZN4Heap10deallocateEPv':
-				print(fi.name, fi.mangled_name, hex(int(address.getOffset())))
 			found_any = True
 	if not found_any and not fi.is_maybe_inline:
 		print(f'function {fi.name} mangled to {fi.mangled_name} and has no link location')
@@ -437,6 +429,7 @@ def make_var(vi: VarInfo):
 	mangled_name = vi.mangled_name
 	if mangled_name in symbols_arm9:
 		address = symbols_arm9[mangled_name]
+		del symbols_arm9[mangled_name]
 
 		symbol = symbol_table.getPrimarySymbol(address)
 		space, sname = get_namespace_for(vi.name, vi.class_member)
@@ -504,7 +497,7 @@ def main():
 	for name in parse_results.function_member_pointers:
 		create_function_type(name, parse_results.function_member_pointers[name])
 
-	# Step 2: Populate the structs
+	# Step 2: Populate the structs and make vtables
 	skipped_structs = []
 	for name in parse_results.classes:
 		if not populate_struct(parse_results.classes[name]):
@@ -517,12 +510,7 @@ def main():
 		if len(ss) == len(skipped_structs):
 			raise Exception(f'Circular struct dependency? {[s.name for s in ss]}')
 		skipped_structs = ss
-	
-	# Step 3: Create all the functions and vtables
-	for name in parse_results.classes:
-		for method in parse_results.classes[name].methods:
-			create_listing_function(method)
-	# Validate struct sizes. Is after step 3 so that I can inspect vtables.
+	# Validate struct sizes.
 	for name in parse_results.classes:
 		ct = parse_results.classes[name].clang_type
 		gt = get_ghidra_type(ct)
@@ -532,6 +520,11 @@ def main():
 			assert ghidra_size == clang_size, f'Incorrect size for {name}. Expected {hex(clang_size)}, got {hex(ghidra_size)}'
 		else:
 			gt.setDescription('Incomplete data type; full definition was not found in header files. There should not be any non-pointer references to this type.')
+	
+	# Step 3: Create all the functions
+	for name in parse_results.classes:
+		for method in parse_results.classes[name].methods:
+			create_listing_function(method)
 	# static functions
 	for name in parse_results.function_defs:
 		create_listing_function(parse_results.function_defs[name])
@@ -551,4 +544,4 @@ if __name__ == "__main__":
 		main()
 		finished = True
 	finally:
-		currentProgram.endTransaction(tid, True)
+		currentProgram.endTransaction(tid, finished)
