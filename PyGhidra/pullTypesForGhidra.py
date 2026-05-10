@@ -423,22 +423,30 @@ def create_listing_function(fi: FunctionInfo):
 		print(f'function {fi.name} mangled to {fi.mangled_name} and has no link location')
 
 def make_var(mangled_name: str, plain_name: str, is_class_member: bool, ghidra_type: Structure):
+	assert ghidra_type is not None
 	if mangled_name in symbols_arm9:
-		address = symbols_arm9[mangled_name]
-
-		symbol = symbol_table.getPrimarySymbol(address)
-		space, sname = get_namespace_for(plain_name, is_class_member)
-		if symbol:
-			if sname == symbol.getName():
-				return # symbol updater: we expect to get this
-			symbol.setNameAndNamespace(sname, space, SourceType.USER_DEFINED)
-		else:
-			symbol_table.createLabel(address, sname, space, SourceType.USER_DEFINED)
 		if ghidra_type.getLength() < 0:
 			print(f'skipping symbol {plain_name} because the type {ghidra_type.getName()} is incomplete')
 			return
-		listing.clearCodeUnits(address, address.add(ghidra_type.getLength()), False)
-		listing.createData(address, ghidra_type)
+		address = symbols_arm9[mangled_name]
+
+		space, sname = get_namespace_for(plain_name, is_class_member)
+		symbols = symbol_table.getSymbols(address)
+		# If there are other symbols that we made, that's OK as long as the data types match.
+		existing_data_type: DataType | None = None
+		for s in symbols:
+			if s.getName(True) == plain_name:
+				return
+			if s.getSource() == SourceType.USER_DEFINED:
+				if existing_data_type is None:
+					existing_data_type = listing.getDataAt(address).getDataType()
+				if existing_data_type != ghidra_type:
+					raise Exception(f'Cannot have two different data types at the same address. {s.getName(True)} exists with {existing_data_type.getName()} at {address} and we tried to make {plain_name} with {ghidra_type.getName()}.')
+		# If the only symbol is a default symbol, it will be overwritten.
+		symbol_table.createLabel(address, sname, space, SourceType.USER_DEFINED)
+		if existing_data_type is None:
+			listing.clearCodeUnits(address, address.add(ghidra_type.getLength() - 1), False)
+			listing.createData(address, ghidra_type)
 	else:
 		print(f'variable {plain_name} mangled to {mangled_name} and has no link location')
 
@@ -542,18 +550,20 @@ def main():
 	for name in parse_results.classes:
 		for method in parse_results.classes[name].methods:
 			create_listing_function(method)
-		make_vtable_symbol(parse_results.classes[name])
 	# static functions
 	for name in parse_results.function_defs:
 		create_listing_function(parse_results.function_defs[name])
 		
-	# Step 4: Static variables
+	# Step 4: Static variables, must happen after all functions because we use clearCodeUnits(0x4000) at each function.
 	for name in parse_results.static_vars:
 		make_var_vi(parse_results.static_vars[name])
+	# vtables
+	for name in parse_results.classes:
+		make_vtable_symbol(parse_results.classes[name])
 
 	if len(symbols_arm9) != 0:
-		print('Unused symbols for arm9:')
-		print([s for s in symbols_arm9])
+		print('Unused symbols for arm9 (limit 1000):')
+		print([s for s in symbols_arm9][:1000])
 
 if __name__ == "__main__":
 	tid = currentProgram.startTransaction('', None)
