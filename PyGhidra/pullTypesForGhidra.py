@@ -295,7 +295,12 @@ def populate_struct(class_info: ClassInfo):
 			func_type = type_manager.getDataType('/' + method.name.replace('::', '/'))
 			func_ptr_type = type_manager.getPointer(func_type)
 			func_ptr_type = type_manager.addDataType(func_ptr_type, conflictHandler)
-			vtable_type.add(func_ptr_type, 0, method.name.split('::')[-1], None)
+			if '::~' in method.name:
+				# vtables contain destructors D1 then D0
+				vtable_type.add(func_ptr_type, 0, '~D1', None)
+				vtable_type.add(func_ptr_type, 0, '~D0', None)
+			else:
+				vtable_type.add(func_ptr_type, 0, method.name.split('::')[-1], None)
 	
 	anon_field_count = 0
 	padding_count = 0
@@ -329,17 +334,15 @@ def populate_struct(class_info: ClassInfo):
 	done_structs.add(class_info.name)
 	return True
 
-def _create_listing_function(fi: FunctionInfo, address: Address):
+def _create_listing_function(fi: FunctionInfo, address: Address) -> Function:
 	parent_namespace, fname = get_namespace_for(fi.name, fi.class_member)
 	
 	# Make or get function
 	func = function_manager.getFunctionAt(address)
 	if func is not None:
-		if func.getName() == fname:
+		if func.getName(True) == fi.name:
 			if fi.is_ctor or fi.is_dtor:
-				return # expected
-			elif func.isThunk():
-				pass # expected? but we still need to update it
+				return func # expected
 			else:
 				raise Exception(f'??? {fname} {hex(address.getOffset())}')
 		func.setName(fname, SourceType.USER_DEFINED)
@@ -400,25 +403,34 @@ def _create_listing_function(fi: FunctionInfo, address: Address):
 		True,
 		SourceType.USER_DEFINED,
 		*func_params)
+	return func
 
+ctor_variants = ['C1', 'C2', 'C3', 'CI1', 'CI2']
+dtor_variants = ['D1', 'D0', 'D2']
 def create_listing_function(fi: FunctionInfo):
-	mangled_names = [fi.mangled_name]
+	variants = [None]
 	if fi.is_ctor:
-		# We're just going to assume the mangled name doesn't contain extra C1E substrings
-		mangled_names.append(fi.mangled_name.replace('C1E', 'C2E'))
-		mangled_names.append(fi.mangled_name.replace('C1E', 'C3E'))
-		mangled_names.append(fi.mangled_name.replace('C1E', 'CI1E'))
-		mangled_names.append(fi.mangled_name.replace('C1E', 'CI2E'))
+		variants = ctor_variants
 	elif fi.is_dtor:
-		mangled_names.append(fi.mangled_name.replace('D1E', 'D0E'))
-		mangled_names.append(fi.mangled_name.replace('D1E', 'D2E'))
+		variants = dtor_variants
 	found_any = False
-	for mangled_name in mangled_names:
+	for variant in variants:
+		mangled_name = fi.mangled_name
+		if variant is not None:
+			# We're just going to assume the mangled name doesn't contain extra C1E etc substrings
+			mangled_name = mangled_name.replace(f'{variant[:-1]}1E', f'{variant}E')
 		if mangled_name in symbols_arm9:
 			address = symbols_arm9[mangled_name]
 			del symbols_arm9[mangled_name]
-			_create_listing_function(fi, address)
+			tor = _create_listing_function(fi, address)
 			found_any = True
+			if variant is not None:
+				comment = tor.getRepeatableComment()
+				if comment is None:
+					comment = variant
+				else:
+					comment = f'{comment}, {variant}'
+				tor.setRepeatableComment(comment)
 	if not found_any and not fi.is_maybe_inline:
 		print(f'function {fi.name} mangled to {fi.mangled_name} and has no link location')
 
@@ -429,6 +441,13 @@ def make_var(mangled_name: str, plain_name: str, is_class_member: bool, ghidra_t
 			print(f'skipping symbol {plain_name} because the type {ghidra_type.getName()} is incomplete')
 			return
 		address = symbols_arm9[mangled_name]
+		if mangled_name.startswith('_ZTV'):
+			# Virtual tables: The symbol points to the start of the vtable object.
+			# But pointers in memory to the vtable point to its address point.
+			# The vtable data structures we've made for Ghidra also begin at the address point.
+			# So, we will move the address here to the vtable's address point.
+			# And we assume that the difference is 8 bytes.
+			address = address.add(8)
 
 		space, sname = get_namespace_for(plain_name, is_class_member)
 		symbols = symbol_table.getSymbols(address)
