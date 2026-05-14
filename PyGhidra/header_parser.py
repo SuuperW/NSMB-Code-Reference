@@ -19,6 +19,8 @@ from clang.cindex import (
 LLVM_LIB = os.environ.get('LIBCLANG_PATH')
 if LLVM_LIB is not None:
 	assert Path(LLVM_LIB).exists(), f'could not find LLVM at {LLVM_LIB}'
+if LLVM_LIB is not None:
+	Config.set_library_file(LLVM_LIB)
 
 class TypedefInfo:
 	renamed_type: Type
@@ -593,17 +595,10 @@ def get_translation_unit(path: str, project_root: str, clang_args: list, return_
 def parse_project(
  project_root: str,
  clang_args: list[str],
- print_func: Callable,
  return_errors: bool = False) -> ParseResults | list[str] | None:
 	global project_include_path
 	project_include_path = project_root.replace('\\', '/') + '/include/'
 		
-	global print # Ghidra
-	print = print_func
-	
-	if LLVM_LIB is not None:
-		Config.set_library_file(LLVM_LIB)
-	
 	# scan, collect types
 	file_to_parse = (Path(project_root) / 'for_ghidra.h').absolute()
 	assert file_to_parse.exists()
@@ -615,7 +610,7 @@ def parse_project(
 		if diag.severity > 2:
 			errors.append(diag_str)
 		elif not return_errors:
-			print_func(diag_str)
+			print(diag_str)
 	
 	if return_errors:
 		return errors

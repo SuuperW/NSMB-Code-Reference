@@ -10,15 +10,17 @@ from ghidra.app.plugin.assembler import (
 	Assemblers,
 	AssemblySemanticException,
 	AssemblySyntaxException)
+from ghidra.app.script import GhidraScript
 from ghidra.app.util import MemoryBlockUtils
 from ghidra.program.model.address import Address, AddressFactory, AddressSet
 from ghidra.program.model.lang import LanguageID
 from ghidra.program.model.listing import Program
 from ghidra.program.model.mem import Memory, MemoryBlock
 
-# --- Python imports. Idk why, but in headless mode we need . in path.
-import sys
-sys.path.append('.')
+# Ghidra shenanigans
+def join(ghidra_script: GhidraScript):
+	global script
+	script = ghidra_script
 
 # Converts a byte array to a 32-bit unsigned int
 def getInt(fileBytes: bytes, index: int) -> int:
@@ -42,31 +44,23 @@ def getBytes(v):
 	intBytes.append((v >> 24) & 0xFF)
 	return intBytes
 
-class Patcher:
+class ROM_Importer:
 	aFactory: AddressFactory
 	mem: Memory
 	asm: Assembler
 	file_contents: bytes
 	program: Program
 	
-	def __init__(self, path: str, createNew = False):
+	def __init__(self, path: str, name: str):
 		# Create a new program
-		if createNew:
-			self.program = createProgram('NDS SRE', LanguageID('ARM:LE:32:v5t'))
-		else:
-			self.program = currentProgram
+		self.program = script.createProgram(name, LanguageID('ARM:LE:32:v5t'))
 		# get stuff
 		self.aFactory = self.program.getAddressMap().getAddressFactory()
 		self.mem = self.program.getMemory()
 		self.asm = Assemblers.getAssembler(self.program)
-		# Ghidra headless only works if we start with a program.
-		# So the command to run Ghidra creates a program by importing a dummy file.
-		# But we don't need or want that memory block.
-		if not createNew:
-			self.mem.removeBlock(self.mem.getBlocks()[0], monitor);
 		with open(path, 'rb') as fs:
 			self.file_contents = fs.read()
-
+	
 	def createMemoryBlock(self,
 	  name: str,
 	  address: Address,
@@ -84,7 +78,7 @@ class Patcher:
 		if dataLength != 0:
 			blockData = self.mem.createInitializedBlock(
 				name, address, dataLength,
-				0, monitor, isOverlay)
+				0, script.monitor, isOverlay)
 			# Load data into block
 			blockData.putBytes(blockData.getStart(), sourceData, sourceIndex, dataLength)
 		blockBss: MemoryBlock | None = None
@@ -93,10 +87,10 @@ class Patcher:
 				name = name + '-bss'
 			blockBss = self.mem.createUninitializedBlock(
 				name, address.add(dataLength), bssLength, isOverlay)
-
+		
 		return blockData, blockBss
-
-	def loadRomCode(self):
+	
+	def loadRomCode(self):		
 		importData: bytes = self.file_contents
 		# Read the file's header
 		arm9EntryPoint = getInt(importData, 0x00)
@@ -120,7 +114,7 @@ class Patcher:
 		# arm7 entry function
 		addressInArm7Block = arm7Block.getStart()
 		addressInArm7Block.add(arm7EntryPoint - arm7BaseAddress)
-		createFunction(addressInArm7Block, "entry_arm7")
+		script.createFunction(addressInArm7Block, "entry_arm7")
 		
 		# create arm9 sections
 		currentSectionSrcAddress = arm7DataPointer + arm7Length
@@ -137,32 +131,25 @@ class Patcher:
 			tableIndex += 4
 			isOverlay = getBool(sectionsTable, tableIndex)
 			tableIndex += 1
-
+			
 			self.createMemoryBlock(
 				name, address, isOverlay,
 				sectionDataSize, sectionBssSize,
 				importData, currentSectionSrcAddress,
 			)
-
+			
 			# Increment values for next loop
 			currentSectionSrcAddress += sectionDataSize
-			sectionId += 1			
+			sectionId += 1
 		# arm9 entry function
-		createFunction(
+		script.createFunction(
 			self.aFactory.getAddress(hex(arm9EntryPoint)),
 			'entry_arm9')
 
-	def run(self):
-		println('Loading data...')
-		self.loadRomCode()
-
-dir = ''
-if len(getScriptArgs()) == 0:
-	dir = askFile('where is ghidraData.bin', 'open').getAbsolutePath()
-	patcher = Patcher(dir, True)
-	patcher.run()
-else:
-	# Headless
-	dir = getScriptArgs()[0]
-	patcher = Patcher(dir)
-	patcher.run()
+if __name__ == '__main__':
+	global script
+	script = this
+	
+	file_path = askFile('where is ghidraData.bin', 'open').getAbsolutePath()
+	importer = ROM_Importer(file_path, 'NDS SRE')
+	importer.loadRomCode()
