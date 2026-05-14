@@ -36,22 +36,19 @@ def parse_assignment(line):
 class SymbolParser:
 	addr_factory: AddressFactory
 	mem: Memory
-	default_space: str
-	current_space: str
-	symbols: dict[str, Address]
+	current_overlay: int
+	symbols: dict[str, (int, str)] # (overlay_id, hex_address)
 	
 	def __init__(self, script: GhidraScript, path: str):
 		currentProgram = script.getCurrentProgram()
 		self.addr_factory = currentProgram.getAddressFactory()
 		self.mem = currentProgram.getMemory()
 		
-		self.default_space = currentProgram.getAddressFactory().getDefaultAddressSpace().getName()
-		self.current_space = self.default_space
-		
+		self.current_overlay = -1
 		self.symbols = self.parse(path)
 		
 	def parse(self, path: str):
-		symbols_from_file: dict[str, Address] = {}
+		symbols_from_file: dict[str, (int, str)] = {}
 		with open(path, 'r') as fs:
 			while line := fs.readline():
 				if line.startswith('/*'):
@@ -63,9 +60,9 @@ class SymbolParser:
 							ov_str_len += 1
 						ov_str = ov_str[:ov_str_len]
 						ov_id = int(ov_str)
-						self.current_space = f'ov9_{ov_id}'
+						self.current_space = ov_id
 					elif 'arm9' in line:
-						self.current_space = self.default_space
+						self.current_space = -1
 			
 				tup = parse_assignment(line)
 				if tup is None:
@@ -75,15 +72,8 @@ class SymbolParser:
 				if not address.startswith('0x'):
 					symbols_from_file[name] = symbols_from_file[address]
 				else:
-					symbols_from_file[name] = self.resolve_address(address)
+					symbols_from_file[name] = (self.current_space, address)
 		return symbols_from_file
-
-	def resolve_address(self, addr_str: str) -> Address:
-		addr = self.addr_factory.getAddress(f'{self.current_space}:{addr_str}')
-		block: MemoryBlock | None = self.mem.getBlock(addr)
-		if block is None:
-			raise Exception(f'Failed to resolve address {self.current_space}:{addr_str}.')
-		return addr
 
 def parse_symbols(script: GhidraScript, path: str) -> dict[str, Address]:
 	parser = SymbolParser(script, path)

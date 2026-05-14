@@ -16,6 +16,7 @@ import ImportNDS
 import header_parser
 import parse_symbols_file
 import import_libclang
+import programs
 
 from ghidra.app.services import ProgramManager
 from ghidra.program.database import DataTypeArchiveDB
@@ -33,7 +34,7 @@ class ProgramGenerator:
 	def generate(self, project_root: str):
 		print('loading ROM data...')
 		ImportNDS.join(this)
-		importer = ImportNDS.ROM_Importer(f'{project_root}/files/ghidraData.bin', 'NSMB')
+		importer = ImportNDS.ROM_Importer(f'{project_root}/files/ghidraData.bin', 'NSMB', [])
 		self.program = importer.program
 		prog_tid = self.program.startTransaction('', None)
 		importer.loadRomCode()
@@ -47,7 +48,8 @@ class ProgramGenerator:
 		# These types from NSMB-CR are problematic for Ghidra. And really they seem totally unnecessary.
 		ignore = ['BitFlag<u32>', 'BitFlag<u8>', 'StrongBitFlag<u32>']
 		
-		import_libclang.join(this)
+		print('creating Ghidra types...')
+		# Get a project data type archive
 		project_folder = getProjectRootFolder()
 		project_archive: DataTypeArchiveDB
 		paf = project_folder.getFile(type_archive_name)
@@ -57,9 +59,15 @@ class ProgramGenerator:
 		else:
 			project_archive = DataTypeArchiveDB(project_folder, type_archive_name, locking_object)
 		dtm = project_archive.getDataTypeManager()
+		# Load the types into it
 		tm_tid = dtm.startTransaction('')
+		finished = False
 		try:
-			import_libclang.run(parse_results, symbols_arm9, ignore, dtm)
+			type_generator = import_libclang.TypeGenerator(this, dtm)
+			type_generator.generate(parse_results, ignore)
+			symbol_generator = import_libclang.SymbolGenerator(currentProgram, dtm)
+			symbol_generator.generate(parse_results, symbols_arm9, importer.overlay_spaces, True)
+			finished = True
 		finally:
 			dtm.endTransaction(tm_tid, True)
 			self.program.endTransaction(prog_tid, True)

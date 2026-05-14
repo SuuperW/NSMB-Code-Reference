@@ -47,17 +47,21 @@ def getBytes(v):
 class ROM_Importer:
 	default_space: AddressSpace
 	mem: Memory
-	asm: Assembler
 	file_contents: bytes
 	program: Program
 	
-	def __init__(self, path: str, name: str):
+	ram_group: list
+	overlay_spaces: dict[int, AddressSpace]
+	
+	def __init__(self, path: str, name: str, ram_group: list):
+		self.ram_group = ram_group
+		self.overlay_spaces = {}
 		# Create a new program
 		self.program = script.createProgram(name, LanguageID('ARM:LE:32:v5t'))
 		# get stuff
 		self.default_space = self.program.getAddressFactory().getDefaultAddressSpace()
+		self.overlay_spaces[-1] = self.default_space
 		self.mem = self.program.getMemory()
-		self.asm = Assemblers.getAssembler(self.program)
 		with open(path, 'rb') as fs:
 			self.file_contents = fs.read()
 	
@@ -117,6 +121,7 @@ class ROM_Importer:
 		currentSectionSrcAddress = arm7DataPointer + arm7Length
 		sectionId = 0
 		tableIndex = 0
+		overlay_index = 0
 		while sectionId < sectionsCount:
 			(nameLen, name) = getString(sectionsTable, tableIndex)
 			tableIndex += nameLen
@@ -131,7 +136,10 @@ class ROM_Importer:
 			
 			space = self.default_space
 			if isOverlay:
-				space = self.program.createOverlaySpace(name, space)
+				if overlay_index not in self.ram_group and name not in self.ram_group:
+					space = self.program.createOverlaySpace(name, space)
+				self.overlay_spaces[overlay_index] = space
+				overlay_index += 1
 			# Note: space.getAddress(int) does not work! Must use hex str.
 			self.createMemoryBlock(
 				name, space.getAddress(hex(address)), isOverlay,
