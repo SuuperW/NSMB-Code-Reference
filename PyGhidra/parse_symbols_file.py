@@ -1,6 +1,6 @@
 from ghidra.app.script import GhidraScript
 from ghidra.program.model.address import Address, AddressFactory
-from ghidra.program.model.mem import MemoryBlock
+from ghidra.program.model.mem import Memory, MemoryBlock
 from ghidra.program.model.symbol import SourceType, SymbolType
 
 import string
@@ -35,25 +35,18 @@ def parse_assignment(line):
 
 class SymbolParser:
 	addr_factory: AddressFactory
-	overlay_blocks: list[MemoryBlock]
-	regular_blocks: list[MemoryBlock]
-	current_overlay: int | None
+	mem: Memory
+	default_space: str
+	current_space: str
 	symbols: dict[str, Address]
 	
 	def __init__(self, script: GhidraScript, path: str):
 		currentProgram = script.getCurrentProgram()
 		self.addr_factory = currentProgram.getAddressFactory()
-		memory = currentProgram.getMemory()
+		self.mem = currentProgram.getMemory()
 		
-		self.overlay_blocks = []
-		self.regular_blocks = []
-		for block in memory.getBlocks():
-			if block.isOverlay():
-				self.overlay_blocks.append(block)
-			else:
-				self.regular_blocks.append(block)
-				
-		self.current_overlay: int | None
+		self.default_space = currentProgram.getAddressFactory().getDefaultAddressSpace().getName()
+		self.current_space = self.default_space
 		
 		self.symbols = self.parse(path)
 		
@@ -69,9 +62,10 @@ class SymbolParser:
 						while len(ov_str) > ov_str_len and ov_str[ov_str_len].isdigit():
 							ov_str_len += 1
 						ov_str = ov_str[:ov_str_len]
-						self.current_overlay = int(ov_str)
+						ov_id = int(ov_str)
+						self.current_space = f'ov9_{ov_id}'
 					elif 'arm9' in line:
-						self.current_overlay = None
+						self.current_space = self.default_space
 			
 				tup = parse_assignment(line)
 				if tup is None:
@@ -85,28 +79,11 @@ class SymbolParser:
 		return symbols_from_file
 
 	def resolve_address(self, addr_str: str) -> Address:
-		matches = []
-		if self.current_overlay is None:
-			for block in self.regular_blocks:
-				bname = block.getName()
-				test_address = self.addr_factory.getAddress(addr_str)
-				if test_address is not None and block.contains(test_address):
-					matches.append(test_address)
-		else:
-			overlay_str = f'_{self.current_overlay}'
-			for block in self.overlay_blocks:
-				bname = block.getName()
-				if overlay_str not in bname:
-					continue
-				
-				test_address = self.addr_factory.getAddress(f'{bname}:{addr_str}')
-				if test_address is not None and block.contains(test_address):
-					matches.append(test_address)
-				
-		if len(matches) != 1:
-			matches_str = [str(m) for m in matches]
-			raise Exception(f'Failed to resolve address {addr_str} in overlay {self.current_overlay}. {len(matches)}: {str.join(', ', matches_str)}')
-		return matches[0]
+		addr = self.addr_factory.getAddress(f'{self.current_space}:{addr_str}')
+		block: MemoryBlock | None = self.mem.getBlock(addr)
+		if block is None:
+			raise Exception(f'Failed to resolve address {self.current_space}:{addr_str}.')
+		return addr
 
 def parse_symbols(script: GhidraScript, path: str) -> dict[str, Address]:
 	parser = SymbolParser(script, path)

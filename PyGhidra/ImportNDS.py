@@ -12,7 +12,7 @@ from ghidra.app.plugin.assembler import (
 	AssemblySyntaxException)
 from ghidra.app.script import GhidraScript
 from ghidra.app.util import MemoryBlockUtils
-from ghidra.program.model.address import Address, AddressFactory, AddressSet
+from ghidra.program.model.address import Address, AddressSet, AddressSpace
 from ghidra.program.model.lang import LanguageID
 from ghidra.program.model.listing import Program
 from ghidra.program.model.mem import Memory, MemoryBlock
@@ -45,7 +45,7 @@ def getBytes(v):
 	return intBytes
 
 class ROM_Importer:
-	aFactory: AddressFactory
+	default_space: AddressSpace
 	mem: Memory
 	asm: Assembler
 	file_contents: bytes
@@ -55,7 +55,7 @@ class ROM_Importer:
 		# Create a new program
 		self.program = script.createProgram(name, LanguageID('ARM:LE:32:v5t'))
 		# get stuff
-		self.aFactory = self.program.getAddressMap().getAddressFactory()
+		self.default_space = self.program.getAddressFactory().getDefaultAddressSpace()
 		self.mem = self.program.getMemory()
 		self.asm = Assemblers.getAssembler(self.program)
 		with open(path, 'rb') as fs:
@@ -70,9 +70,6 @@ class ROM_Importer:
 	  sourceData: bytes,
 	  sourceIndex: int
 	  ) -> tuple[MemoryBlock | None, MemoryBlock | None]:
-		# Convert address to a Ghidra address obj
-		addr_str: str = "0x%08x" % address
-		address: Address = self.aFactory.getAddress(addr_str)
 		# Create the block(s)
 		blockData: MemoryBlock | None = None
 		if dataLength != 0:
@@ -107,14 +104,14 @@ class ROM_Importer:
 		
 		# create arm7 section
 		arm7Block = self.createMemoryBlock(
-			'arm7', arm7BaseAddress, False,
+			'arm7', self.default_space.getAddress(hex(arm7BaseAddress)), False,
 			arm7Length, 0,
 			importData, arm7DataPointer
 		)[0]
 		# arm7 entry function
-		addressInArm7Block = arm7Block.getStart()
-		addressInArm7Block.add(arm7EntryPoint - arm7BaseAddress)
-		script.createFunction(addressInArm7Block, "entry_arm7")
+		script.createFunction(
+			self.default_space.getAddress(hex(arm7EntryPoint)),
+			'entry_arm7')
 		
 		# create arm9 sections
 		currentSectionSrcAddress = arm7DataPointer + arm7Length
@@ -132,8 +129,12 @@ class ROM_Importer:
 			isOverlay = getBool(sectionsTable, tableIndex)
 			tableIndex += 1
 			
+			space = self.default_space
+			if isOverlay:
+				space = self.program.createOverlaySpace(name, space)
+			# Note: space.getAddress(int) does not work! Must use hex str.
 			self.createMemoryBlock(
-				name, address, isOverlay,
+				name, space.getAddress(hex(address)), isOverlay,
 				sectionDataSize, sectionBssSize,
 				importData, currentSectionSrcAddress,
 			)
@@ -143,7 +144,7 @@ class ROM_Importer:
 			sectionId += 1
 		# arm9 entry function
 		script.createFunction(
-			self.aFactory.getAddress(hex(arm9EntryPoint)),
+			self.default_space.getAddress(hex(arm9EntryPoint)),
 			'entry_arm9')
 
 if __name__ == '__main__':
