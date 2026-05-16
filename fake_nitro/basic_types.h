@@ -70,6 +70,23 @@ typedef struct NNSG3dResMdl {
 	};
 } NNSG3dResMdl;
 
+typedef struct NNSG3dAnmObj {
+	union {
+		int _fake_[1];
+		struct {
+			u32 numMapData;
+			u32 mapData[];
+		};
+	};
+} NNSG3dAnmObj;
+
+typedef struct NNSG3dRS {
+	union {
+		int _fake_[1];
+		u8 c[4];
+	};
+} NNSG3dRS;
+
 // Auto-gen can't figure out this one.
 typedef int SNDCommandID;
 

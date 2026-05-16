@@ -28,34 +28,26 @@ void MTX_Concat43(const MtxFx43* a, const MtxFx43* b, MtxFx43* ab);
 
 u32 MATH_CLAMP(u64, u32, u32);
 
-typedef struct NNSG3dRS { u8 c[4]; } NNSG3dRS;
 struct fake_nitro_return_struct { void* ptrUser; };
 struct fake_nitro_return_struct* NNS_G3dRSGetRenderObj(NNSG3dRS*);
-typedef void NNSG3dMatAnmResult; NNSG3dMatAnmResult* NNS_G3dRSGetMatAnmResult(NNSG3dRS*);
-typedef struct NNSG3dJntAnmResult { int flag; } NNSG3dJntAnmResult; NNSG3dJntAnmResult* NNS_G3dRSGetJntAnmResult(NNSG3dRS*);
-typedef void NNSG3dVisAnmResult; NNSG3dVisAnmResult* NNS_G3dRSGetVisAnmResult(NNSG3dRS*);
+NNSG3dMatAnmResult* NNS_G3dRSGetMatAnmResult(NNSG3dRS*);
+NNSG3dJntAnmResult* NNS_G3dRSGetJntAnmResult(NNSG3dRS*);
+NNSG3dVisAnmResult* NNS_G3dRSGetVisAnmResult(NNSG3dRS*);
 
 void NNS_G3dRenderObjSetFlag(NNSG3dRenderObj*, int);
 void NNS_G3dRenderObjResetFlag(NNSG3dRenderObj*, int);
 void NNS_G3dRenderObjSetUserPtr(NNSG3dRenderObj*, void*);
 
-typedef struct NNSG3dAnmObj {
-	u32 numMapData;
-	u32 mapData[];
-} NNSG3dAnmObj;
 void NNS_G3dAnmObjSetFrame(NNSG3dAnmObj*, int);
 void NNS_G3dAnmObjSetFrame(NNSG3dAnmObj*, int);
 
 u16 GX_RGB(int r, int g, int b);
 
 u16 SND_CalcChannelVolume(int);
-typedef int SNDWaveFormat; typedef int SNDChannelLoop; typedef int SNDChannelDataShift;
 void SND_SetupChannelPcm(int chNo, SNDWaveFormat format, const void* dataAddr, SNDChannelLoop loop, int loopStart, int dataLen, int volume, SNDChannelDataShift shift, int timer, int pan);
 void SND_StartTimer(u32 chBitMask, u32 capBitMask, u32 alarmBitMask, u32 flags);
 void SND_StopTimer(u32 chBitMask, u32 capBitMask, u32 alarmBitMask, u32 flags);
-typedef void* SNDAlarmHandler;
 void SND_SetupAlarm(int alarmNo, u32 tick, u32 period, SNDAlarmHandler handler, void* arg);
-typedef int SNDCapture; typedef int SNDCaptureFormat; typedef int SNDCaptureIn; typedef int SNDCaptureOut;
 void SND_SetupCapture(SNDCapture capture, SNDCaptureFormat format, void* buffer_p, u32 length, BOOL loopFlag, SNDCaptureIn in, SNDCaptureOut out);
 
 #ifdef __cplusplus

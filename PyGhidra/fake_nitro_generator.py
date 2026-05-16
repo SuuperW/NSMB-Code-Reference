@@ -30,8 +30,6 @@ if not Path(auto_gen_file).exists():
 	with open(auto_gen_file, 'w') as fs:
 		fs.write('#pragma once\n\n')
 Path(f'{PROJECT_ROOT}/{nitro_dir}/nitro/cht.h').touch()
-#	with open(f'{PROJECT_ROOT}/{nitro_dir}/nitro/cht.h', 'w') as fs:
-#		pass
 
 types_made: set[str] = set()
 wrong_sizes: dict[str, tuple] = {}
@@ -153,9 +151,9 @@ def collect_errors():
 	converted_to_typedef: set[str] = set()
 	attrs_made: set[str] = set()
 	
-	max_iterations = 10
+	max_iterations = 12
 	i = 0
-	errors = header_parser.parse_project(PROJECT_ROOT, ['-ferror-limit=20'], print, True)
+	errors = header_parser.parse_project(PROJECT_ROOT, ['-ferror-limit=25'], True)
 	while len(errors) != 0 and i < max_iterations:
 		unknown_types_this_iteration = 0
 		for e in errors:
@@ -235,15 +233,15 @@ def collect_errors():
 					
 					record_wrong_size(type_name, expected_size, location)
 
-		errors = header_parser.parse_project(PROJECT_ROOT, ['-ferror-limit=50'], print, True)
+		errors = header_parser.parse_project(PROJECT_ROOT, ['-ferror-limit=25'], True)
 		i += 1
-	if i == max_iterations:
+	if len(errors) != 0:
 		for e in errors:
 			print(e)
-		raise Exception('reached max iterations')
+		raise Exception(f'reached max iterations, {len(errors)} errors left')
 	
 def fix_fake_types():
-	parse_results = header_parser.parse_project(PROJECT_ROOT, [], print, False)
+	parse_results = header_parser.parse_project(PROJECT_ROOT, [], False)
 		
 	wrong_size_types: dict[str, StructSizeInfo] = {}
 	types_containing_fake_struct: dict[str, list[str]] = defaultdict(list)
