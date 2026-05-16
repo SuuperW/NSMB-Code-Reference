@@ -1,10 +1,3 @@
-from ghidra.app.script import GhidraScript
-from ghidra.program.model.address import Address, AddressFactory
-from ghidra.program.model.mem import Memory, MemoryBlock
-from ghidra.program.model.symbol import SourceType, SymbolType
-
-import string
-
 def parse_assignment(line):
 	line = line.strip()
 	if len(line) == 0:
@@ -33,48 +26,33 @@ def parse_assignment(line):
 
 	return (var_name, value_str)
 
-class SymbolParser:
-	addr_factory: AddressFactory
-	mem: Memory
-	current_overlay: int
-	symbols: dict[str, (int, str)] # (overlay_id, hex_address)
+def parse_symbols(path: str) -> dict[str, (int, str)]:
+	# name -> (overlay_id, hex_address)
+	symbols_from_file: dict[str, (int, str)] = {}
+	current_space = -1
 	
-	def __init__(self, script: GhidraScript, path: str):
-		currentProgram = script.getCurrentProgram()
-		self.addr_factory = currentProgram.getAddressFactory()
-		self.mem = currentProgram.getMemory()
+	with open(path, 'r') as fs:
+		while line := fs.readline():
+			if line.startswith('/*'):
+				if 'arm9_ov' in line:
+					index = line.index('arm9_ov')
+					ov_str = line[index+7:]
+					ov_str_len = 1
+					while len(ov_str) > ov_str_len and ov_str[ov_str_len].isdigit():
+						ov_str_len += 1
+					ov_str = ov_str[:ov_str_len]
+					ov_id = int(ov_str)
+					current_space = ov_id
+				elif 'arm9' in line:
+					current_space = -1
 		
-		self.current_overlay = -1
-		self.symbols = self.parse(path)
-		
-	def parse(self, path: str):
-		symbols_from_file: dict[str, (int, str)] = {}
-		with open(path, 'r') as fs:
-			while line := fs.readline():
-				if line.startswith('/*'):
-					if 'arm9_ov' in line:
-						index = line.index('arm9_ov')
-						ov_str = line[index+7:]
-						ov_str_len = 1
-						while len(ov_str) > ov_str_len and ov_str[ov_str_len].isdigit():
-							ov_str_len += 1
-						ov_str = ov_str[:ov_str_len]
-						ov_id = int(ov_str)
-						self.current_space = ov_id
-					elif 'arm9' in line:
-						self.current_space = -1
-			
-				tup = parse_assignment(line)
-				if tup is None:
-					continue
+			tup = parse_assignment(line)
+			if tup is None:
+				continue
 
-				(name, address) = tup
-				if not address.startswith('0x'):
-					symbols_from_file[name] = symbols_from_file[address]
-				else:
-					symbols_from_file[name] = (self.current_space, address)
-		return symbols_from_file
-
-def parse_symbols(script: GhidraScript, path: str) -> dict[str, Address]:
-	parser = SymbolParser(script, path)
-	return parser.symbols
+			(name, address) = tup
+			if not address.startswith('0x'):
+				symbols_from_file[name] = symbols_from_file[address]
+			else:
+				symbols_from_file[name] = (current_space, address)
+	return symbols_from_file

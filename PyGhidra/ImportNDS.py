@@ -44,19 +44,49 @@ def getBytes(v):
 	intBytes.append((v >> 24) & 0xFF)
 	return intBytes
 
+class SectionInfo:
+	name: str
+	address: int
+	section_data_size: int
+	section_bss_size: int
+	is_overlay: bool
+	
+	end_index: int
+	src_index: int | None
+	overlay_index: int | None
+	
+	def __init__(self, table: bytes, table_index: int):
+		(nameLen, name) = getString(table, table_index)
+		self.name = name
+		table_index += nameLen
+		self.address = getInt(table, table_index)
+		table_index += 4
+		self.section_data_size = getInt(table, table_index)
+		table_index += 4
+		self.section_bss_size = getInt(table, table_index)
+		table_index += 4
+		self.is_overlay = getBool(table, table_index)
+		table_index += 1
+		
+		self.end_index = table_index
+		self.src_index = None
+		self.overlay_index = None
+
 class ROM_Importer:
 	default_space: AddressSpace
 	mem: Memory
 	file_contents: bytes
+	script: GhidraScript
 	program: Program
 	
-	ram_group: list
+	program_config: dict
 	overlay_spaces: dict[int, AddressSpace]
 	
-	def __init__(self, path: str, name: str, ram_group: list):
-		self.ram_group = ram_group
+	def __init__(self, script: GhidraScript, path: str, name: str, program_config: dict):
+		self.program_config = program_config
 		self.overlay_spaces = {}
 		# Create a new program
+		self.script = script
 		self.program = script.createProgram(name, LanguageID('ARM:LE:32:v5t'))
 		# get stuff
 		self.default_space = self.program.getAddressFactory().getDefaultAddressSpace()
@@ -79,7 +109,7 @@ class ROM_Importer:
 		if dataLength != 0:
 			blockData = self.mem.createInitializedBlock(
 				name, address, dataLength,
-				0, script.monitor, isOverlay)
+				0, self.script.monitor, isOverlay)
 			# Load data into block
 			blockData.putBytes(blockData.getStart(), sourceData, sourceIndex, dataLength)
 		blockBss: MemoryBlock | None = None
@@ -113,52 +143,103 @@ class ROM_Importer:
 			importData, arm7DataPointer
 		)[0]
 		# arm7 entry function
-		script.createFunction(
+		self.script.createFunction(
 			self.default_space.getAddress(hex(arm7EntryPoint)),
 			'entry_arm7')
 		
 		# create arm9 sections
 		currentSectionSrcAddress = arm7DataPointer + arm7Length
 		sectionId = 0
-		tableIndex = 0
+		table_index = 0
 		overlay_index = 0
+		
+		section_infos = []
+		loaded_overlays = self.program_config.get('loaded_overlays') or []
+		extra_ram_spaces = []
 		while sectionId < sectionsCount:
-			(nameLen, name) = getString(sectionsTable, tableIndex)
-			tableIndex += nameLen
-			address = getInt(sectionsTable, tableIndex)
-			tableIndex += 4
-			sectionDataSize = getInt(sectionsTable, tableIndex)
-			tableIndex += 4
-			sectionBssSize = getInt(sectionsTable, tableIndex)
-			tableIndex += 4
-			isOverlay = getBool(sectionsTable, tableIndex)
-			tableIndex += 1
-			
-			space = self.default_space
-			if isOverlay:
-				if overlay_index not in self.ram_group and name not in self.ram_group:
-					space = self.program.createOverlaySpace(name, space)
-				self.overlay_spaces[overlay_index] = space
+			si = SectionInfo(sectionsTable, table_index)
+			table_index = si.end_index
+			si.src_index = currentSectionSrcAddress
+			if si.is_overlay:
+				si.overlay_index = overlay_index
+				if overlay_index in loaded_overlays:
+					extra_ram_spaces.append((si.address, si.address + si.section_bss_size + si.section_bss_size))
 				overlay_index += 1
-			# Note: space.getAddress(int) does not work! Must use hex str.
-			self.createMemoryBlock(
-				name, space.getAddress(hex(address)), isOverlay,
-				sectionDataSize, sectionBssSize,
-				importData, currentSectionSrcAddress,
-			)
+			section_infos.append(si)
 			
 			# Increment values for next loop
-			currentSectionSrcAddress += sectionDataSize
+			currentSectionSrcAddress += si.section_data_size
 			sectionId += 1
+		
+		# ram sections
+		created_overlays = set()
+		for si in section_infos:
+			if si.overlay_index is not None:
+				if si.overlay_index not in loaded_overlays:
+					continue
+				else:
+					self.overlay_spaces[si.overlay_index] = self.default_space
+				created_overlays.add(si.overlay_index)
+			
+			# Note: space.getAddress(int) does not work! Must use hex str.
+			assert si.src_index is not None
+			self.createMemoryBlock(
+				si.name,
+				self.default_space.getAddress(hex(si.address)),
+				False,
+				si.section_data_size,
+				si.section_bss_size,
+				importData,
+				si.src_index,
+			)
+		
+		# overlays
+		groups = self.program_config.get('overlay_groups') or {}
+		for group_name in groups:
+			space = self.program.createOverlaySpace(group_name, self.default_space)
+			for ov_id in groups[group_name]:
+				self.overlay_spaces[ov_id] = space
+		
+		skip_unloaded = self.program_config.get('skip_unloaded_overlays') or False
+		for si in section_infos:
+			if si.overlay_index is None:
+				continue
+			if si.overlay_index in created_overlays:
+				continue
+			if skip_unloaded:
+				skip = False
+				for ram_range in extra_ram_spaces:
+					end = si.address + si.section_data_size + si.section_bss_size
+					if end > ram_range[0] and si.address < ram_range[1]:
+						skip = True
+						break
+				if skip:
+					continue
+			
+			# Note: space.getAddress(int) does not work! Must use hex str.
+			assert si.src_index is not None
+			space: AddressSpace
+			if si.overlay_index in self.overlay_spaces:
+				space = self.overlay_spaces[si.overlay_index]
+			else:
+				space = self.program.createOverlaySpace(si.name, self.default_space)
+				self.overlay_spaces[si.overlay_index] = space
+			self.createMemoryBlock(
+				si.name,
+				space.getAddress(hex(si.address)),
+				si.is_overlay,
+				si.section_data_size,
+				si.section_bss_size,
+				importData,
+				si.src_index,
+			)
+			
 		# arm9 entry function
-		script.createFunction(
+		self.script.createFunction(
 			self.default_space.getAddress(hex(arm9EntryPoint)),
 			'entry_arm9')
 
 if __name__ == '__main__':
-	global script
-	script = this
-	
 	file_path = askFile('where is ghidraData.bin', 'open').getAbsolutePath()
-	importer = ROM_Importer(file_path, 'NDS SRE')
+	importer = ROM_Importer(this, file_path, 'NDS SRE')
 	importer.loadRomCode()

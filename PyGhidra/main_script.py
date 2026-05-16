@@ -9,6 +9,7 @@ if int(getGhidraVersion()[:2]) < 12:
 	raise Exception('Ghidra versions before 12 are not supported.')
 
 from pathlib import Path
+import importlib.util
 import os
 import sys
 
@@ -16,70 +17,132 @@ import ImportNDS
 import header_parser
 import parse_symbols_file
 import import_libclang
-import programs
 
 from ghidra.app.services import ProgramManager
+from ghidra.framework.model import DomainFile
+from ghidra.program.model.data import DataTypeManager
 from ghidra.program.database import DataTypeArchiveDB
 from ghidra.program.model.listing import Program
 
 locking_object = ''
-type_archive_name = 'NSMB_Types'
+type_archive_name = 'ProjectTypes'
 
 class ProgramGenerator:
+	project_archive: DataTypeArchiveDB | None
+	project_archive_file: DomainFile | None
+	project_type_manager: DataTypeManager
+	tm_tid: int
+	
+	project_root: str
+	config: dict
+	parse_results: header_parser.ParseResults
+	symbols_arm9: dict
+	
 	program: Program | None
+	prog_tid: int
+	all_programs: list[Program]
 	
-	def __init__(self):
+	_has_reported_symbols: bool
+	_has_released: bool
+	_rom_data_path: str
+	
+	def __init__(self, project_root: str, config: dict):
 		self.program = None
-	
-	def generate(self, project_root: str):
-		print('loading ROM data...')
-		ImportNDS.join(this)
-		importer = ImportNDS.ROM_Importer(f'{project_root}/files/ghidraData.bin', 'NSMB', [])
-		self.program = importer.program
-		prog_tid = self.program.startTransaction('', None)
-		importer.loadRomCode()
+		self.all_programs = []
 		
-		print('parsing header files...')
-		parse_results = header_parser.parse_project(project_root, sys.argv[1:])
+		self.project_root = project_root
 		
-		print('parsing symbols...')
-		symbols_arm9 = parse_symbols_file.parse_symbols(this, f'{project_root}/symbols9.x')
-		
-		# These types from NSMB-CR are problematic for Ghidra. And really they seem totally unnecessary.
-		ignore = ['BitFlag<u32>', 'BitFlag<u8>', 'StrongBitFlag<u32>']
-		
-		print('creating Ghidra types...')
-		# Get a project data type archive
 		project_folder = getProjectRootFolder()
-		project_archive: DataTypeArchiveDB
 		paf = project_folder.getFile(type_archive_name)
 		if paf is not None:
-			project_archive = paf.getDomainObject(project_folder, False, False, monitor)
-			project_archive.addConsumer(locking_object)
+			self.project_archive = paf.getDomainObject(locking_object, False, False, monitor)
 		else:
-			project_archive = DataTypeArchiveDB(project_folder, type_archive_name, locking_object)
-		dtm = project_archive.getDataTypeManager()
-		# Load the types into it
-		tm_tid = dtm.startTransaction('')
-		finished = False
-		try:
-			type_generator = import_libclang.TypeGenerator(this, dtm)
-			type_generator.generate(parse_results, ignore)
-			symbol_generator = import_libclang.SymbolGenerator(currentProgram, dtm)
-			symbol_generator.generate(parse_results, symbols_arm9, importer.overlay_spaces, True)
-			finished = True
-		finally:
-			dtm.endTransaction(tm_tid, True)
-			self.program.endTransaction(prog_tid, True)
-			if finished or not OPTION_DELETE_ON_ERROR:
-				project_archive.save('', monitor)
-			project_archive.release(locking_object)
-			if OPTION_DELETE_ON_ERROR and not finished:
-				# delete the file, if it did not already exist
-				if paf is None:
-					paf = project_folder.getFile(type_archive_name)
-					print(f'deleting {paf}')
-					paf.delete()
+			self.project_archive = DataTypeArchiveDB(project_folder, type_archive_name, locking_object)
+		self.project_archive_file = paf
+		self.project_type_manager = self.project_archive.getDataTypeManager()
+		
+		self.tm_tid = self.project_type_manager.startTransaction('')
+		self._has_released = False
+		
+		if 'programs' not in config:
+			config['programs'] = {}
+		if len(config['programs']) == 0:
+			proj_name = project_root.replace('\\', '/').split('/')[-1]
+			config['programs'][proj_name] = {}
+		if 'c_types_to_ignore' not in config:
+			config['c_types_to_ignore'] = []
+		self.config = config
+		self._has_reported_symbols = False
+		
+		if Path(f'{self.project_root}/ghidra_files/ghidraData.bin').exists():
+			self._rom_data_path = f'{self.project_root}/ghidra_files/ghidraData.bin'
+		elif Path(f'{self.project_root}/files/ghidraData.bin').exists():
+			self._rom_data_path = f'{self.project_root}/files/ghidraData.bin'
+		else:
+			raise Exception('ghidraData.bin was not found under [project]/files or [project]/ghidra_files')
+		print(self._rom_data_path)
+	
+	def generate_types(self):
+		type_generator = import_libclang.TypeGenerator(this, self.project_type_manager)
+		type_generator.generate(self.parse_results, self.config['c_types_to_ignore'])
+	
+	def create_program(self, name: str, program_config: dict):
+		ImportNDS.join(this)
+		importer = ImportNDS.ROM_Importer(this, self._rom_data_path, name, program_config)
+		self.program = importer.program
+		self.all_programs.append(self.program)
+		self.prog_tid = self.program.startTransaction('', None)
+		importer.loadRomCode()
+		
+		report_symbols = (not self._has_reported_symbols) and (not program_config['skip_unloaded_overlays'])
+		
+		symbol_generator = import_libclang.SymbolGenerator(currentProgram, self.project_type_manager)	
+		symbol_generator.generate(
+			self.parse_results,
+			self.symbols_arm9,
+			importer.overlay_spaces,
+			report_symbols,
+		)
+		if report_symbols:
+			self._has_reported_symbols = True
+		
+		self.program.endTransaction(self.prog_tid, True)
+		self.program = None
+	
+	def generate(self):
+		print('parsing header files...')
+		self.parse_results = header_parser.parse_project(self.project_root, [])
+		print('parsing symbols...')
+		self.symbols_arm9 = parse_symbols_file.parse_symbols(f'{self.project_root}/symbols9.x')	
+		print('creating Ghidra types...')		
+		self.generate_types()
+		
+		programs = self.config['programs']
+		for program_name in programs:
+			print(f'creating program "{program_name}"')
+			self.create_program(program_name, programs[program_name])
+		
+		self.release(True)
+	
+	def release(self, save: bool):
+		if self._has_released:
+			return
+		assert self.project_archive is not None
+		
+		self.project_type_manager.endTransaction(self.tm_tid, save)
+		if self.program is not None:
+			self.program.endTransaction(self.prog_tid, save)
+			
+		if save:
+			self.project_archive.save('', monitor)
+		self.project_archive.release(locking_object)
+		self.project_archive = None # Once released, it is closed and the object cannot be used.
+		if (not save) and self.project_archive_file is None:
+			# The file did not exist before starting generation, so delete it
+			paf = getProjectRootFolder().getFile(type_archive_name)
+			paf.delete()
+		
+		self._has_released = True
 
 if __name__ == '__main__':
 	project_root = os.environ.get('GHIDRA_EXTRACT_SOURCE')
@@ -87,12 +150,30 @@ if __name__ == '__main__':
 		project_root = askDirectory('source location', 'load').getAbsolutePath()
 	assert Path(project_root).is_dir(), f'The given source directory {project_root} does not exist. '
 	
+	config = None
+	has_config = False
+	config_path = f'{project_root}/ghidra_files/config.py'
+	if Path(config_path).exists:
+		spec = importlib.util.spec_from_file_location('config', config_path)
+		config = importlib.util.module_from_spec(spec)
+		spec.loader.exec_module(config)
+		assert hasattr(config, 'config')
+		config = config.config
+		has_config = True
+	else:
+		config = {}
+		print('No config file found. Using defaults.')
+
 	program_manager = state.getTool().getService(ProgramManager)
-	g = ProgramGenerator()
+	g = ProgramGenerator(project_root, config)
 	finished = False
 	try:
-		g.generate(project_root)
+		g.generate()
 		finished = True
 	finally:
-		if not finished and OPTION_DELETE_ON_ERROR and g.program is not None:
-			program_manager.closeProgram(g.program, True)
+		should_delete = (not finished) and OPTION_DELETE_ON_ERROR
+		g.release(not should_delete)
+		if should_delete:
+			# delete all generated programs
+			for p in g.all_programs:
+				program_manager.closeProgram(p, True)

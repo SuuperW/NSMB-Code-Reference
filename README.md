@@ -22,7 +22,7 @@ These instructions are for Windows 11, but you may be able to get it to work on 
 - Activate the virtional environment. `.\venv\Scripts\activate.bat`
 - Install clang 18, then libclang 18. (libclang must be installed after clang is installed) `pip install clang==18.1.8` `pip install libclang==18.1.1`
 - Close the terminal.
-- By default, Ghidra runs without Python enabled. Copy `ghidraWithPy.bat` from this repo into the directory with Ghidra. This file will activate the virtual environment then start Ghidra with Python enabled.
+- By default, Ghidra runs without Python enabled. Copy `ghidraWithPy.bat` from `ghidra_files` in this repo into the directory with Ghidra. This file will activate the virtual environment then start Ghidra with Python enabled.
 - Run `ghidraWithPy.bat`
 - - The first time you run it, you will be asked if you want to install PyGhidra. Type `y` then press enter.
 
@@ -30,6 +30,7 @@ These instructions are for Windows 11, but you may be able to get it to work on 
 - Run `.\NDS-ROM-Exprter path/to/ROM`
 - - If you have the bios files, but them in the same directory as the ROM or provide paths to them with `-bios7 path` and `-bios9 path`.
 - - This will create a file `ghidraData.bin` in the working directory.
+- Move `ghidraData.bin` to the `ghidra_files` directory of this repo (or to one named `files`).
 - Create a new project in Ghidra
 - - File -> New Project -> Non-shared project -> Next
 - - Choose a directory to save the Ghidra project and give the project a name, then click Finish
@@ -41,7 +42,7 @@ These instructions are for Windows 11, but you may be able to get it to work on 
 - - Close the Bundle Manager window
 - - Click the "Refresh Script List" icon in the Script Manager window
 - On the left side of the Script Manager window, scroll down to NDS-SRE and select it
-- Run `ImportNDS.py`, then navigate to and open `ghidraData.bin`
 - If you are using `fake_nitro`, run `fake_nitro_generator.py`. Select the folder where you cloned this repo to and wait a bit for it to finish.
-- Run `pullTypesForGhidra.py`. select the folder whre you cloned this repo to and wait a while for it to finish.
-- - After this script finishes, Ghidra will automatically begin to analyze the program. This will take a long time and Ghidra may be unresponsive during this time. (There will be a progress bar in the bottom right, which will reset about a thousand times during this process.)
+- Run `main_script.py`, select the folder whre you cloned this repo to and wait a while for it to finish.
+- - After this script finishes, Ghidra will automatically begin to analyze the program but only from the functions the script created. You'll want to use the menu option Analysis -> Auto Analyze to have it analyze the entire thing.
+- - This will take a long time and Ghidra may be unresponsive during this time. (There will be a progress bar in the bottom right, which will reset about a thousand times during this process.)

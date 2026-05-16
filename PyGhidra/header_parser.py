@@ -595,14 +595,14 @@ def get_translation_unit(path: str, project_root: str, clang_args: list, return_
 def parse_project(
  project_root: str,
  clang_args: list[str],
- return_errors: bool = False) -> ParseResults | list[str] | None:
+ return_errors: bool = False) -> ParseResults | list[str]:
 	global project_include_path
 	project_include_path = project_root.replace('\\', '/') + '/include/'
 		
 	# scan, collect types
-	file_to_parse = (Path(project_root) / 'for_ghidra.h').absolute()
+	file_to_parse = (Path(project_root) / 'ghidra_files'/ 'for_ghidra.h').absolute()
 	assert file_to_parse.exists()
-	tu = get_translation_unit(str(file_to_parse), project_root, clang_args)
+	tu = get_translation_unit(str(file_to_parse), project_root, [])
 	errors = []
 	for diag in tu.diagnostics:
 		# Weird.

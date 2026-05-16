@@ -644,7 +644,7 @@ class SymbolGenerator:
 		addr = space.getAddress(addr_str)
 		if self.mem.getBlock(addr) is None:
 			if self.report_symbols:
-				raise Exception(f'Failed to resolve address {overlay_id}:{addr_str}.')
+				raise Exception(f'Failed to resolve address {space.getName()}:{addr_str} for overlay {overlay_id}.')
 			return None
 		return addr
 	
