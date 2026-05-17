@@ -578,6 +578,7 @@ def get_translation_unit(path: str, project_root: str, clang_args: list, return_
 		+ '-fno-rtti -fno-exceptions -std=c++23'.split(' ')
 		+ [
 		'-DSDK_ARM9', # This isn't in the .json file given in the NSMB template for NCPatcher, but seems necessary. Does NCPatcher automatically include it?
+		'-D_LIBCPP_HAS_NO_LIBRARY_SIZED_DEALLOCATION', # NSMB doesn't have sized deallocation.
 		'-x', 'c++', # language
 		'-target', 'arm-none-eabi',
 		'-fsyntax-only',

@@ -1623,8 +1623,6 @@ _Znwm		= 0x0204C0D0;
 _Znaj		= 0x0204C0C4;
 _Znam		= 0x0204C0C4;
 _ZdlPv		= 0x0204C0B8;
-_ZdlPvj		= 0x0204C0B8;
-_ZdlPvm		= 0x0204C0B8;
 _ZdaPv		= 0x0204C0AC;
 
 _ZTV9FrameHeap = 0x02085144;
