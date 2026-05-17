@@ -91,6 +91,7 @@ NTR_LONGCALL NTR_THUMB void MTX_RotY43(MtxFx43& mtx, fx16 sine, fx16 cosine);
 NTR_LONGCALL NTR_THUMB void MTX_RotZ43(MtxFx43& mtx, fx16 sine, fx16 cosine);
 
 // Standard C++ attributes do not allow overriding already existing functions
+extern "C" {
 __attribute__((noreturn)) extern void OS_Terminate();
 
 NTR_FORMAT(printf, 2, 3) int OS_SPrintf(char *dst, const char *fmt, ...);
@@ -105,4 +106,5 @@ NTR_FORMAT(printf, 3, 4) inline int OS_SNPrintf(char* dst, size_t len, const cha
 
 	return OS_VSNPrintf(dst, len, fmt, vl);
 
+}
 }
