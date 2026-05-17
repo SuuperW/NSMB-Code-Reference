@@ -4,6 +4,7 @@
 #@runtime PyGhidra
 
 OPTION_DELETE_ON_ERROR = True
+OPTION_SKIP_TYPES = False
 
 if int(getGhidraVersion()[:2]) < 12:
 	raise Exception('Ghidra versions before 12 are not supported.')
@@ -57,6 +58,8 @@ class ProgramGenerator:
 		if paf is not None:
 			self.project_archive = paf.getDomainObject(locking_object, False, False, monitor)
 		else:
+			if OPTION_SKIP_TYPES:
+				raise Exception('OPTION_SKIP_TYPES is on, but types do not exist.')
 			self.project_archive = DataTypeArchiveDB(project_folder, type_archive_name, locking_object)
 		self.project_archive_file = paf
 		self.project_type_manager = self.project_archive.getDataTypeManager()
@@ -80,7 +83,6 @@ class ProgramGenerator:
 			self._rom_data_path = f'{self.project_root}/files/ghidraData.bin'
 		else:
 			raise Exception('ghidraData.bin was not found under [project]/files or [project]/ghidra_files')
-		print(self._rom_data_path)
 	
 	def generate_types(self):
 		type_generator = import_libclang.TypeGenerator(this, self.project_type_manager)
@@ -113,9 +115,10 @@ class ProgramGenerator:
 		print('parsing header files...')
 		self.parse_results = header_parser.parse_project(self.project_root, [])
 		print('parsing symbols...')
-		self.symbols_arm9 = parse_symbols_file.parse_symbols(f'{self.project_root}/symbols9.x')	
-		print('creating Ghidra types...')		
-		self.generate_types()
+		self.symbols_arm9 = parse_symbols_file.parse_symbols(f'{self.project_root}/symbols9.x')
+		if not OPTION_SKIP_TYPES:
+			print('creating Ghidra types...')		
+			self.generate_types()
 		
 		programs = self.config['programs']
 		for program_name in programs:
