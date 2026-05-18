@@ -34,9 +34,9 @@ public:
 	// 02153954
 	static RedCoinRing* construct();
 
-	static constexpr u16 ObjectID = 151;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::RedCoinRing;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 175;
 
 	static ActorProfile profile; // 0216CD90

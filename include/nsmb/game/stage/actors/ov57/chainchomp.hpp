@@ -76,9 +76,9 @@ public:
 	// 021753B8
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 45;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::ChainChomp;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 59;
 
 	// 02175750

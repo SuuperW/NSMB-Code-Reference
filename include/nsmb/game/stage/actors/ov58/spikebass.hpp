@@ -53,9 +53,9 @@ public:
 	// 02172b18
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 150;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::SpikeBass;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 174;
 
 	// 02173680

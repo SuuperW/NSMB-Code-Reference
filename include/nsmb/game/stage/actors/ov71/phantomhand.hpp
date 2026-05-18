@@ -37,9 +37,9 @@ public:
 	// 02177C54
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 152;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::PhantomHand;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 176;
 
 	// 021795D0

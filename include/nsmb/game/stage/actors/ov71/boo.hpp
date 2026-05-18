@@ -111,9 +111,9 @@ public:
 	// 02177468
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 41;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Boo;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 55;
 
 	// 02179378
@@ -233,9 +233,9 @@ public:
 	// 02177484
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 42;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::BalloonBoo;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 56;
 
 	// 02179384

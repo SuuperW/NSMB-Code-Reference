@@ -67,9 +67,9 @@ public:
 	static bool loadResources();
 
 
-	static constexpr u16 ObjectID = 35;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::BobOmb;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 48;
 
 	static const ActorProfile profile;

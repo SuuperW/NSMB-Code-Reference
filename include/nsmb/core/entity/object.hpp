@@ -3,7 +3,6 @@
 #include "common.hpp"
 #include "base.hpp"
 
-
 struct ObjectProfile {
 
 	Object* (*constructor)();

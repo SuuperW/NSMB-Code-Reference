@@ -51,9 +51,9 @@ public:
 	Case 9 -> S
 	*/
 
-	static constexpr u16 ObjectID = 0;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::BootScene;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 7;
 
 	//021874c4

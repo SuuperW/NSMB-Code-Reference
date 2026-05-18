@@ -33,9 +33,9 @@ public:
 	// 0216236C
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 159;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Checkpoint;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 187;
 
 	// 0216FF58
@@ -65,9 +65,9 @@ class VerticalCheckpoint : public Checkpoint // TODO Remove
 {
 public:
 
-	static constexpr u16 ObjectID = 158;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::VerticalCheckpoint;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 186;
 
 	// 0216FF64

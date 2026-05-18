@@ -40,9 +40,9 @@ public:
 	// 020DE288
 	Vec3 setVector(fx32 x, fx32 y, fx32 z);
 
-	static constexpr u16 ObjectID = 324;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::EndingCamera;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 4;
 
 	// 020E9BF0

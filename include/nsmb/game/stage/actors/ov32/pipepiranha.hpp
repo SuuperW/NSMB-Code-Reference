@@ -175,9 +175,9 @@ class PiranhaUp : public PipePiranha // TODO Remove
 {
 public:
 
-	static constexpr u16 ObjectID = 23;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::PipePiranhaUp;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 31;
 
 	// 021439C8
@@ -191,9 +191,9 @@ class PiranhaDown : public PipePiranha // TODO Remove
 {
 public:
 
-	static constexpr u16 ObjectID = 24;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::PipePiranhaDown;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 32;
 
 	// 021439D4
@@ -207,9 +207,9 @@ class PiranhaRight : public PipePiranha // TODO Remove
 {
 public:
 
-	static constexpr u16 ObjectID = 25;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::PipePiranhaRight;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 33;
 
 	// 021439E0
@@ -223,9 +223,9 @@ class PiranhaLeft : public PipePiranha // TODO Remove
 {
 public:
 
-	static constexpr u16 ObjectID = 26;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::PipePiranhaLeft;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 34;
 
 	// 021439EC

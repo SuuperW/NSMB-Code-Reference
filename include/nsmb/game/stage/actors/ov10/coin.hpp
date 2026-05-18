@@ -97,9 +97,9 @@ public:
 	// 020D9CF0
 	static void bottomCollision(StageActor& self, StageActor& other);
 
-	static constexpr u16 ObjectID = 66;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Coin;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 158;
 
 	// 021251F8

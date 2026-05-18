@@ -45,7 +45,7 @@ public:
 
 	// 020de2d4
 	void onCleanupResources() override;
-	
+
 	// 020def70
 	bool updateMain() override;
 	// 020df41c
@@ -119,9 +119,9 @@ public:
 	static bool loadResources();
 
 
-	static constexpr u16 ObjectID = 94;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::KoopaTroopa;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 163;
 
 	// 021261b4
@@ -240,9 +240,9 @@ public:
 		u16 unused 				: 16;
 	};
 
-	static constexpr u16 ObjectID = 95;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::KoopaParatroopa;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 164;
 
 	// 021261c0

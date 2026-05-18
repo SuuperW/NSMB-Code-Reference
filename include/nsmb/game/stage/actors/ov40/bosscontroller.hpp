@@ -78,9 +78,9 @@ public:
 	// 02143B04
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 114;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::BossController;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 132;
 
 	// 02146720
@@ -137,7 +137,7 @@ public:
 	s8 cutsceneStep;
 	u8 unused53C;
 	bool peachSpawned;
-	
+
 
 #if NTR_EXT_EXISTS(BossController)
 	#include NTR_EXT_INCLUDE(BossController)

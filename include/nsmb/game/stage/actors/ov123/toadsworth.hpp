@@ -8,9 +8,9 @@ public:
 
 	typedef bool(Toadsworth::*StateFunction)();
 
-	static constexpr u16 ObjectID = 134;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Toadsworth;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 152;
 
 	StateFunction* updateFunction;  // Current update function

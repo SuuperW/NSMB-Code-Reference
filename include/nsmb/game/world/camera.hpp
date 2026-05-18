@@ -39,9 +39,9 @@ public:
 	//0x020CCCD4
 	void updateState();
 
-	static constexpr u16 ObjectID = 318;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::WorldCamera;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 1;
 
 	// 0x020E58D0

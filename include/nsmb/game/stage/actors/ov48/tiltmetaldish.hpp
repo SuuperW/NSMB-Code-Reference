@@ -40,9 +40,9 @@ public:
 	static bool loadResources();
 
 
-	static constexpr u16 ObjectID = 169;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::TiltMetalDish;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 208;
 
 	static const ActorProfile profile;

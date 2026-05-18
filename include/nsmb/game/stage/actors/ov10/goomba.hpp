@@ -72,9 +72,9 @@ public:
 	// 020E0D98
 	bool pipeExitState(void* arg);
 
-	static constexpr u16 ObjectID = 83;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Goomba;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 160;
 
 	// 021263FC
@@ -165,9 +165,9 @@ public:
 	// D1: 020E2624
 	virtual ~Paragoomba() {}
 
-	static constexpr u16 ObjectID = 84;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Paragoomba;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 161;
 
 	// 02126408
@@ -196,9 +196,9 @@ public:
 	// D1: 020E26FC
 	virtual ~MiniGoomba() {}
 
-	static constexpr u16 ObjectID = 85;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::MiniGoomba;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 162;
 
 	// 02126414

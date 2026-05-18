@@ -584,9 +584,9 @@ public:
 	s32 onDestroy() override;
 
 
-	static constexpr u16 ObjectID = 21;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Player;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 28;
 
 	static constexpr fx32 modelScaleFactor = fx32(0.9);

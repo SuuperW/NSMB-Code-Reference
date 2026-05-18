@@ -55,9 +55,9 @@ public:
 		QuitDialog = 2
 	};
 
-	static constexpr u16 ObjectID = 9;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::WorldmapScene;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 294;
 
 	Particle::Handler unk64;

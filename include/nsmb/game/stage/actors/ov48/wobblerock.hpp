@@ -45,9 +45,9 @@ public:
 	static bool loadResources();
 
 
-	static constexpr u16 ObjectID = 170;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::WobbleRock;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 209;
 
 	// 02148920

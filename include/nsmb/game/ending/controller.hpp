@@ -62,9 +62,9 @@ public:
 	// 020E1FD4
 	static bool loadSlideshowResources();
 
-	static constexpr u16 ObjectID = 314;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::EndingController;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 305;
 
 	// 020EE2C8

@@ -22,9 +22,9 @@ public:
 	// 020D7FDC
 	void onCleanupResources() override;
 
-	static constexpr u16 ObjectID = 0x31;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Zoom;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 0x3F;
 
 	// 02125088

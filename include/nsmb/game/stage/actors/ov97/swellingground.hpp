@@ -75,9 +75,9 @@ public:
 	// 02185790
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 231;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::SwellingGround;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 194;
 
 	// 02188830

@@ -89,9 +89,9 @@ public:
 	// 0213d768
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 55;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::DryBones;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 69;
 
 	// 0213f450
@@ -202,9 +202,9 @@ public:
 	// D0: 0213d954
 	virtual ~BigDryBones();
 
-	static constexpr u16 ObjectID = 56;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::BigDryBones;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 70;
 
 	// 0213f45c

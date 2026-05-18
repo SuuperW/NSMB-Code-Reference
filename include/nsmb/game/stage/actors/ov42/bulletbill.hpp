@@ -98,9 +98,9 @@ public:
 	// 0214A8D4
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 27;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::BulletBill;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 38;
 
 	// 02151FB0
@@ -185,9 +185,9 @@ public:
 	// 0214A8B0
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 238;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::BanzaiBill;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 39;
 
 	// 02151FBC

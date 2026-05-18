@@ -48,9 +48,9 @@ public:
 	// 0218D700
 	static s32 activeCallback(ActiveCollider& self, ActiveCollider& other);
 
-	static constexpr u16 ObjectID = 185;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::BigSpikedBall;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 226;
 
 	// 0218E0D0

@@ -9,7 +9,7 @@ class Peach : public StageEntity {
 public:
 
 	using StateFunction = bool(Peach::*)();
-	
+
 	// D0: 02143C20
 	// D1: 02143B94
 	virtual ~Peach();
@@ -37,9 +37,9 @@ public:
 	// 02144DAC
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 115;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Peach;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 133;
 
 	// 02146870
@@ -47,7 +47,7 @@ public:
 
 	// 021464A4
 	static const PointSensor bottomSensor;
-	
+
 
 	ModelAnm peachModel;
 	Model signModel;

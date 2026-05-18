@@ -84,9 +84,9 @@ public:
 	// 02155E80
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 237;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Trampoline;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 50;
 
 	// 0216D154

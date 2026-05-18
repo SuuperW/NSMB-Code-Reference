@@ -27,9 +27,9 @@ public:
 	// 02156F44
 	bool mainState();
 
-	static constexpr u16 ObjectID = 92;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::CoinSpawner;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 119;
 
 	// 0216D4DC

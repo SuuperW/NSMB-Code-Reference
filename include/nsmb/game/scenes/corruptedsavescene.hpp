@@ -83,9 +83,9 @@ public:
 	}
 
 
-	static constexpr u16 ObjectID = 11;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::CorruptedSaveScene;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 18;
 
 	static const ObjectProfile profile;

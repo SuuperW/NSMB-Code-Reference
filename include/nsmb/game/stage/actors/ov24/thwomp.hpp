@@ -63,9 +63,9 @@ public:
 	// 0213E364
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 37;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Thwomp;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 51;
 
 	// 0213F6D0
@@ -133,9 +133,9 @@ public:
 	// D1: 0213E45C
 	virtual ~GiantThwomp() {}
 
-	static constexpr u16 ObjectID = 38;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::GiantThwomp;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 52;
 
 	// 0213F6DC

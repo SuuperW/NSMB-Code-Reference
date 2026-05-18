@@ -68,9 +68,9 @@ public:
 	// 02143500
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 91;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Snailicorn;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 127;
 
 	// 02143770

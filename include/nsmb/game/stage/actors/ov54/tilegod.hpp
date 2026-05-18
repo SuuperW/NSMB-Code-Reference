@@ -50,9 +50,9 @@ public:
 	// 021569CC
 	void updateTiles(bool create, bool silent);
 
-	static constexpr u16 ObjectID = 206;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::TileGod;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 120;
 
 	// 0216D3B4

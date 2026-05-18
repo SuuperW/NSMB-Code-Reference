@@ -150,9 +150,9 @@ NTR_SIZE_GUARD(SkewerMgr, 0x38);
 
 class SkewerDown : public Skewer { // TODO Remove
 
-	static constexpr u16 ObjectID = 216;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::SkewerDown;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 264;
 
 	static const ActorProfile profile;
@@ -162,9 +162,9 @@ NTR_SIZE_GUARD(SkewerDown, sizeof(Skewer));
 
 class SkewerUp : public Skewer { // TODO Remove
 
-	static constexpr u16 ObjectID = 217;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::SkewerUp;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 265;
 
 	static const ActorProfile profile;
@@ -174,9 +174,9 @@ NTR_SIZE_GUARD(SkewerUp, sizeof(Skewer));
 
 class SkewerLeft : public Skewer { // TODO Remove
 
-	static constexpr u16 ObjectID = 218;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::SkewerLeft;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 266;
 
 	static const ActorProfile profile;
@@ -186,9 +186,9 @@ NTR_SIZE_GUARD(SkewerLeft, sizeof(Skewer));
 
 class SkewerRight : public Skewer { // TODO Remove
 
-	static constexpr u16 ObjectID = 219;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::SkewerRight;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 267;
 
 	static const ActorProfile profile;
@@ -198,9 +198,9 @@ NTR_SIZE_GUARD(SkewerRight, sizeof(Skewer));
 
 class DistancedSkewerDown : public Skewer { // TODO Remove
 
-	static constexpr u16 ObjectID = 220;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::DistancedSkewerDown;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 268;
 
 	static const ActorProfile profile;
@@ -210,9 +210,9 @@ NTR_SIZE_GUARD(DistancedSkewerDown, sizeof(Skewer));
 
 class DistancedSkewerUp : public Skewer { // TODO Remove
 
-	static constexpr u16 ObjectID = 221;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::DistancedSkewerUp;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 269;
 
 	static const ActorProfile profile;
@@ -222,9 +222,9 @@ NTR_SIZE_GUARD(DistancedSkewerUp, sizeof(Skewer));
 
 class DistancedSkewerLeft : public Skewer { // TODO Remove
 
-	static constexpr u16 ObjectID = 222;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::DistancedSkewerLeft;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 270;
 
 	static const ActorProfile profile;
@@ -234,9 +234,9 @@ NTR_SIZE_GUARD(DistancedSkewerLeft, sizeof(Skewer));
 
 class DistancedSkewerRight : public Skewer { // TODO Remove
 
-	static constexpr u16 ObjectID = 223;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::DistancedSkewerRight;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 271;
 
 	static const ActorProfile profile;

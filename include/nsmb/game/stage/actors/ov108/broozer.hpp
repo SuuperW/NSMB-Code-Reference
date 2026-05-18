@@ -79,9 +79,9 @@ public:
 	// 0218AD40
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 120;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Broozer;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 139;
 
 	// 0218AEF0

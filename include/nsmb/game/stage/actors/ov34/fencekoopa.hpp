@@ -69,9 +69,9 @@ public:
 	// 02141F58
 	static void activeCallback(ActiveCollider& self, ActiveCollider& other);
 
-	static constexpr u16 ObjectID = 96;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::FenceKoopa;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 244;
 
 	// 02145200

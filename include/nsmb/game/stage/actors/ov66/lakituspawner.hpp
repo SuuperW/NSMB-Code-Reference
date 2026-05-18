@@ -40,9 +40,9 @@ public:
 	// 02176008
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 59;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::LakituSpawner;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 73;
 
 	// 02178948

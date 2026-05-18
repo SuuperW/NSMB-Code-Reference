@@ -21,9 +21,9 @@ public:
 	// 0218DDE4
 	bool updateMain() override;
 
-	static constexpr u16 ObjectID = 104;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::SpikedBallTrigger;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 225;
 
 	// 0218E1F0

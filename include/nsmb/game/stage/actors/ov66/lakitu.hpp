@@ -117,9 +117,9 @@ public:
 	// 021787AC
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 39;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Lakitu;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 53;
 
 	// 02178AF0

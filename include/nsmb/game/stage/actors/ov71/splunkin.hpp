@@ -63,9 +63,9 @@ public:
 	// 0217905C
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 127;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Splunkin;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 184;
 
 	// 0x02179880

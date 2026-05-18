@@ -25,9 +25,9 @@ public:
 	// 020DDDF4
 	virtual void onCleanupResources() override;
 
-	static constexpr u16 ObjectID = 12;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::EndingScene;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 19;
 
 	// 020E9B88

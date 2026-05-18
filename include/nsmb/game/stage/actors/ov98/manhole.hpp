@@ -59,9 +59,9 @@ public:
 	// 02188A40
 	static void activeCallback(ActiveCollider& self, ActiveCollider& other);
 
-	static constexpr u16 ObjectID = 187;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Manhole;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 233;
 
 	// 02189870

@@ -45,9 +45,9 @@ public:
 	// 0213EFFC
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 65;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::FireBar;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 79;
 
 	// 0213F928

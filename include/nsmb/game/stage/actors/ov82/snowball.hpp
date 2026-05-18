@@ -34,9 +34,9 @@ public:
 	static bool activeCallback(ActiveCollider& self, ActiveCollider& other);
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 156;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Snowball;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 181;
 
 	static const ActorProfile profile;

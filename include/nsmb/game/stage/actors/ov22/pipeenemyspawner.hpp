@@ -36,9 +36,9 @@ public:
 	// 0213C248
 	void spawnBobOmb();
 
-	static constexpr u16 ObjectID = 64;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::PipeEnemySpawner;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 78;
 
 	// 0213C548

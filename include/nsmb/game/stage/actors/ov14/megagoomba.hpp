@@ -123,9 +123,9 @@ public:
 	// 02132E4C
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 239;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::MegaGoomba;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 30;
 
 	// 021330E8

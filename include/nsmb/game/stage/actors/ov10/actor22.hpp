@@ -11,9 +11,9 @@ public:
 	// D1: 020E9368
 	virtual ~Actor22();
 
-	static constexpr u16 ObjectID = 22;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Actor22;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 29;
 
 	// 02126BE0

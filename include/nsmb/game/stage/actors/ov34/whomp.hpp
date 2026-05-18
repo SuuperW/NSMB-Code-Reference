@@ -87,9 +87,9 @@ public:
 	// 02144EE8
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 73;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Whomp;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 85;
 
 	// 02145388

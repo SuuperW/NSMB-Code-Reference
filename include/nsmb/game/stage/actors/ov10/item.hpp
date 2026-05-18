@@ -100,9 +100,9 @@ public:
 
 	bool onPrepareResources();
 
-	static constexpr u16 ObjectID = 31;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Item;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 44;
 
 	Toadsworth* toadsworth;			    // A pointer to your local toadsworth

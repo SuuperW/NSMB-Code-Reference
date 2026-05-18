@@ -66,9 +66,9 @@ public:
 	// 02156638
 	static WarpEntrance* construct();
 
-	static constexpr u16 ObjectID = 87;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::WarpEntrance;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 110;
 
 	// 0216D284

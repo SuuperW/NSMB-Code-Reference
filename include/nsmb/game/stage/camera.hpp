@@ -25,9 +25,9 @@ public:
 	//020ce46c
 	virtual s32 onRender() override;
 
-	static constexpr u16 ObjectID = 316;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::StageCamera;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 0;
 
 	//02123c80

@@ -41,9 +41,9 @@ public:
 	static void activeCallback(ActiveCollider& self, ActiveCollider& other);
 	static bool loadResources();
 
-	static constexpr u16 ObjectID = 121;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::VolcanoEruption;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 140;
 
 	static const ActorProfile profile;

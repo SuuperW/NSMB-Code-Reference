@@ -39,9 +39,9 @@ public:
 	// 021674ec
 	static ColliderCallback topColliderCallback;
 
-	static constexpr u16 ObjectID = 71;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::DonutLift;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 83;
 
 	// 02170538
@@ -73,7 +73,7 @@ public:
 	u8 align47F;
 
 	s8 updateStep;
-	
+
 	u8 align481; // alignment
 	u8 align482;
 	u8 align483;

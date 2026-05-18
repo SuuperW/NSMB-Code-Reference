@@ -87,9 +87,9 @@ public:
 	// 020FB5DC
 	static u32 getSettings(Type type, u8 character, u8 unk);
 
-	static constexpr u16 ObjectID = 18;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::StageFX;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 25;
 
 	// 021277D4

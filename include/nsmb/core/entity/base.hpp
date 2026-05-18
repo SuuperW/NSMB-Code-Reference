@@ -107,7 +107,7 @@ public:
 
 	u32 guid;//GUID
 	u32 settings;
-	u16 id;//Class ID
+	ObjectClassID id;//Class ID
 	ObjectState state;//Object state
 	bool destroyFlag;//Destroy flag
 

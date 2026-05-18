@@ -43,9 +43,9 @@ public:
 	static bool loadResources();
 	static void activeCallback(ActiveCollider& self, ActiveCollider& other);
 
-	static constexpr u16 ObjectID = 98;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Pokey;
 
-	static constexpr u16 UpdatePriority = ObjectID;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 232;
 
 	static const ActorProfile profile;
