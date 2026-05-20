@@ -278,7 +278,7 @@ namespace Math { // TODO Global cleanup
 
 }
 
-consteval s32 operator"" _rad(long double r) {
+consteval s32 operator""_rad(long double r) {
 
 	constexpr long double TwoPi = 6.28318530718;
 
@@ -292,10 +292,10 @@ consteval s32 operator"" _rad(long double r) {
 
 }
 
-consteval s32 operator"" _deg(long double d) {
+consteval s32 operator""_deg(long double d) {
 	return Math::cdeg(d);
 }
 
-consteval s32 operator"" _deg(unsigned long long d) {
+consteval s32 operator""_deg(unsigned long long d) {
 	return Math::cdeg(d);
 }

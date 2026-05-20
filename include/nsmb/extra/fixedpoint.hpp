@@ -658,34 +658,34 @@ constexpr F operator^(T a, F b) {
 }
 
 
-constexpr Fx16 operator"" _fxs(unsigned long long value) {
+constexpr Fx16 operator""_fxs(unsigned long long value) {
 	return Fx16::One * value;
 }
 
-constexpr Fx32 operator"" _fx(unsigned long long value) {
+constexpr Fx32 operator""_fx(unsigned long long value) {
 	return Fx32::One * value;
 }
 
-constexpr Fx64 operator"" _fxl(unsigned long long value)	{
+constexpr Fx64 operator""_fxl(unsigned long long value)	{
 	return Fx64::One * value;
 }
 
-constexpr Fx64c operator"" _fxlc(unsigned long long value) {
+constexpr Fx64c operator""_fxlc(unsigned long long value) {
 	return Fx64c::One * value;
 }
 
-constexpr Fx16 operator"" _fxs(long double value)	{
+constexpr Fx16 operator""_fxs(long double value)	{
 	return Fx16(value);
 }
 
-constexpr Fx32 operator"" _fx(long double value) {
+constexpr Fx32 operator""_fx(long double value) {
 	return Fx32(value);
 }
 
-constexpr Fx64 operator"" _fxl(long double value)	{
+constexpr Fx64 operator""_fxl(long double value)	{
 	return Fx64(value);
 }
 
-constexpr Fx64c operator"" _fxlc(long double value) {
+constexpr Fx64c operator""_fxlc(long double value) {
 	return Fx64c(value);
 }
