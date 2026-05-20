@@ -23,18 +23,35 @@ if LLVM_LIB is not None:
 	Config.set_library_file(LLVM_LIB)
 
 class TypedefInfo:
-	renamed_type: Type
 	new_name: str
 	old_name: str
 
-	def __init__(self, new_name, renamed_type, old_name):
+	def __init__(self, new_name, old_name):
 		self.new_name = new_name
-		self.renamed_type = renamed_type
 		self.old_name = old_name
 
-class FunctionInfo:
+class FunctionTypedefInfo(TypedefInfo):
+	param_names: list[str] | None
+	param_types: list[str]
+	return_type: str
+	
+	def __init__(self, new_name, param_names, param_types, return_type):
+		self.new_name = new_name
+		self.old_name = 'code*'
+		self.param_names = param_names
+		self.param_types = param_types
+		self.return_type = return_type
+
+# This class should eventually go away, in favor of a ClassInfo + FunctionTypedefInfo
+class MemberPointerTypedefInfo(TypedefInfo):
 	clang_type: Type
 	
+	def __init__(self, new_name, old_name, clang_type):
+		self.new_name = new_name
+		self.old_name = old_name
+		self.clang_type = clang_type
+
+class FunctionInfo:
 	name: str
 	mangled_name: str
 	
@@ -48,12 +65,11 @@ class FunctionInfo:
 	
 	class_member: bool
 	
-	param_names: list[str]
+	typedef: FunctionTypedefInfo
 	
-	def __init__(self, class_name: str | None, node: Cursor):
+	def __init__(self, class_name: str | None, node: Cursor, fti: FunctionTypedefInfo):
 		assert node.kind in (CursorKind.CXX_METHOD, CursorKind.CONSTRUCTOR, CursorKind.DESTRUCTOR, CursorKind.FUNCTION_DECL, CursorKind.CONVERSION_FUNCTION), node.kind
 		
-		self.clang_type = node.type
 		if class_name is None:
 			self.name = node.spelling
 			self.class_member = False
@@ -90,17 +106,17 @@ class FunctionInfo:
 			elif t.spelling == '{':
 				break
 
-		self.param_names = []
-		for arg in node.get_arguments():
-			self.param_names.append(arg.spelling)
+		self.typedef = fti
 
 	def get_signature_with_name(self):
 		"""Replaces destructor name with just a ~, so that signature can be compared with base class"""
-		sig = self.clang_type.spelling.replace(' noexcept', '')
-		index = sig.index('(')
+		name = self.name
 		if '~' in self.name:
-			return f'{sig[:index]}~{sig[index:]}'
-		return f'{sig[:index]}{self.name.split('::')[-1]}{sig[index:]}'
+			name = '~'
+		else:
+			name = name.split('::')[-1]
+		params_sig = str.join(', ', self.typedef.param_types)
+		return f'{self.typedef.return_type} {name}({params_sig})'
 
 class ClassInfo:
 	clang_type: Type
@@ -272,8 +288,7 @@ def get_friendly_name(clang_type: Type, node = None) -> str:
 		return 'bool'
 		
 	elif clang_type.kind == TypeKind.MEMBERPOINTER:
-		print(clang_type.get_declaration(), clang_type.get_declaration().get_usr())
-		raise Exception('attempted to get the name of a member pointer; only the typedef has a name')
+		return 'member pointer'
 		
 	elif clang_type.kind == TypeKind.LVALUEREFERENCE:
 		return get_friendly_name(clang_type.get_pointee())
@@ -301,23 +316,13 @@ def get_friendly_name(clang_type: Type, node = None) -> str:
 
 	raise Exception(f'unknown type in get_friendly_name {clang_type.spelling} at {node.location} and is {clang_type.kind}')
 
+def is_function_pointer(clang_type: Type) -> bool:
+	if clang_type.kind not in pointer_types:
+		return False
+	ptee = clang_type.get_pointee()
+	return ptee.kind == TypeKind.FUNCTIONPROTO
+
 # --- Collection
-def get_typedef_info(typedef: Cursor) -> TypedefInfo | Type:
-	name = get_friendly_name(typedef.type)
-	underlying = unelaborate(typedef.underlying_typedef_type)
-	underlying_name = None 
-	if underlying.kind != TypeKind.MEMBERPOINTER:
-		# If it is a member pointer, we won't ever access old_name.
-		underlying_name = get_friendly_name(underlying)
-	
-	if name != underlying_name:
-		return TypedefInfo(name, underlying, underlying_name)
-
-	if underlying.kind in (TypeKind.RECORD, TypeKind.ENUM):
-		return underlying # this happens for typedef struct Foo {} Foo, since we remove 'struct '
-	else:
-		raise Exception(f'Unexpected same-name typedef {name} = {underlying.spelling}, {underlying.kind}')
-
 collectable_type_declarations = (
 	CursorKind.TYPEDEF_DECL,
 	CursorKind.ENUM_DECL,
@@ -348,6 +353,7 @@ class ParseResults:
 	_namespace: str | None # Type.spelling includes namespace automatically, but Cursor.spelling does not.
 	_seen_usrs: set[str] # Unified Symbol Resolution
 	_collected_type_decls: set[tuple[str, int]]
+	_anonymous_function_count: int
 	
 	_unsupported_messages: set[str]
 	
@@ -362,6 +368,7 @@ class ParseResults:
 		self._namespace = None
 		self._seen_usrs = set()
 		self._collected_type_decls = set()
+		self._anonymous_function_count = 0
 		
 		self._incomplete_template_instances = {}
 		self._class_template_cursors = {}
@@ -378,13 +385,13 @@ class ParseResults:
 		else:
 			return symbol
 
-	def collect_type_members(self, node: Type):
+	def collect_type_members(self, node: Type) -> ClassInfo:
 		node = unelaborate(node)
 		ci = ClassInfo(node)
 		
 		if node.kind == TypeKind.UNEXPOSED and node.get_num_template_arguments() > 0 and node.get_size() < 0:
 			self._incomplete_template_instances[ci.name] = node
-			return
+			return ci
 		
 		if ci.name in self.classes:
 			raise Exception(f'Duplicate class {ci.name}')
@@ -407,7 +414,7 @@ class ParseResults:
 				if not child.is_deleted_method() and not pure_virtual:
 					self.collect_function_info(child, ci)
 				elif pure_virtual:
-					fi = FunctionInfo(ci.name, child)
+					fi = FunctionInfo(ci.name, child, self.get_typedef_info('', child))
 					ci.add_method(fi)
 			elif child.kind == CursorKind.VAR_DECL:
 				self.collect_var_or_field(child, ci.name)
@@ -421,35 +428,25 @@ class ParseResults:
 				print('unknown child cursor kind', child.kind, child.spelling, node.spelling, child.location)
 		return ci
 	
-	def collect_func_referenced_types(self, func_type: Type):
-		# For these, the type might again be a function pointer.
-		# So, add param to collect_type to allow it and make up a name?
-		# That function's parameters might also include a function type!
-		if func_type.get_result() != TypeKind.VOID:
-			self.collect_type(func_type.get_result())
-		for arg_type in func_type.argument_types():
-			self.collect_type(arg_type)
-	
 	def collect_type_ti(self, ti: TypedefInfo):
-		if ti.renamed_type.kind != TypeKind.MEMBERPOINTER:
+		if isinstance(ti, MemberPointerTypedefInfo):
+			assert ti.new_name not in self.function_member_pointers, f'Duplicate member pointer {ti.new_name}'
+			self.function_member_pointers[ti.new_name] = ti.clang_type
+			self.get_typedef_info('', ti.clang_type) # collects referenced types
+		else:
 			assert ti.new_name not in self.typedefs, f'Duplicate typedef {ti.new_name}'
 			self.typedefs[ti.new_name] = ti
-			base_renamed = get_base_type(ti.renamed_type)
-			if base_renamed.kind != TypeKind.FUNCTIONPROTO:
-				self.collect_type(base_renamed)
-			else:
-				self.collect_func_referenced_types(base_renamed)
-		else:
-			assert ti.new_name not in self.function_member_pointers, f'Duplicate member pointer {ti.new_name}'
-			self.function_member_pointers[ti.new_name] = ti.renamed_type
-			self.collect_func_referenced_types(ti.renamed_type.get_pointee())
 	
-	def is_already_collected(self, clang_type: Type) -> bool:
+	def is_type_collected(self, clang_type: Type) -> bool:
 		# We can mostly rely on Unified Symbol Resolution to distinguish between types.
 		# But this fails with anonymous types. Multiple anonymous types within a struct have the same USR.
 		# So we also use Cursor.hash.
 		# Cursor.hash cannot be used alone because different template instantiations have the same declaration cursor.
 		# But also we cannot include the hash for non-anonymous types because certain typedefs do get defined twice, with different cursors. (e.g. size_t in the standard library)
+		
+		if clang_type.kind == TypeKind.FUNCTIONPROTO:
+			# We can't really track these, so each collection will be its own type.
+			return False
 		
 		type_decl = clang_type.get_declaration()
 		if clang_type.kind == TypeKind.UNEXPOSED and type_decl.kind == CursorKind.NO_DECL_FOUND:
@@ -458,7 +455,7 @@ class ParseResults:
 			type_decl = clang_type.get_declaration()
 		
 		if clang_type.kind.value < TypeKind.COMPLEX.value and clang_type.kind.value >= TypeKind.VOID.value:
-			return True # built-in type
+			return get_friendly_name(clang_type) # built-in type
 		
 		maybe_hash = type_decl.hash if 'anonymous ' in clang_type.spelling else 0
 		usr_hash = (str(type_decl.get_usr()), maybe_hash)
@@ -468,19 +465,63 @@ class ParseResults:
 		self._collected_type_decls.add(usr_hash)
 		return False
 		
-	def collect_type(self, node: Type):	
+	def get_typedef_info(self, name: str, node: Type | Cursor) -> TypedefInfo | None:
+		clang_type: Type
+		cursor: Cursor | None
+		if isinstance(node, Type):
+			clang_type = node
+			cursor = None
+		else:
+			clang_type = node.type
+			cursor = node
+		
+		underlying = unelaborate(clang_type)
+		underlying_name = get_friendly_name(underlying)
+		
+		if name != underlying_name:
+			if is_function_pointer(underlying) or underlying.kind == TypeKind.FUNCTIONPROTO:
+				underlying = get_base_type(underlying)
+				param_names = []
+				param_types = []
+				if cursor is not None:
+					for arg in cursor.get_arguments():
+						param_names.append(arg.spelling)
+						param_types.append(self.collect_type(arg.type))
+				else:
+					param_names = None
+					for arg in underlying.argument_types():
+						param_types.append(self.collect_type(arg))
+				return FunctionTypedefInfo(
+					new_name = name,
+					param_names = param_names,
+					param_types = param_types,
+					return_type = self.collect_type(underlying.get_result()),
+				)
+			elif underlying.kind == TypeKind.MEMBERPOINTER:
+				return MemberPointerTypedefInfo(name, underlying_name, clang_type)
+			else:
+				self.collect_type(underlying)
+				return TypedefInfo(name, underlying_name)
+
+		if underlying.kind in (TypeKind.RECORD, TypeKind.ENUM):
+			# this happens for typedef struct Foo {} Foo, since we remove 'struct '
+			self.collect_type(underlying)
+			return None
+		else:
+			raise Exception(f'Unexpected same-name typedef {name} = {underlying.spelling}, {underlying.kind}')
+	
+	def collect_type(self, node: Type, name_for_func: str | None = None) -> str:
+		"""Returns the friendly name of the given Type"""
+		friendly_name = get_friendly_name(node)
 		node = get_base_type(node)
-		#if len(usr) == 0 and node.kind.value >= TypeKind.COMPLEX.value: # not built-in type
-		#	raise Exception(f'Cannot collect type with no USR: {node.spelling} {node.kind}')
-		if self.is_already_collected(node):
-			return
+		if self.is_type_collected(node):
+			return friendly_name
 		
 		if node.kind == TypeKind.TYPEDEF:
-			ti = get_typedef_info(node.get_declaration())
-			if isinstance(ti, TypedefInfo):
+			tdef_name = get_friendly_name(node)
+			ti = self.get_typedef_info(tdef_name, node.get_declaration().underlying_typedef_type)
+			if ti is not None:
 				self.collect_type_ti(ti)
-			else:
-				self.collect_type(ti)
 		# struct/union/class
 		elif is_class_type(node):
 			self.collect_type_members(node)
@@ -489,27 +530,29 @@ class ParseResults:
 			enum_name = get_friendly_name(node)
 			assert enum_name not in self.enums, f'Duplicate enum {enum_name}'
 			self.enums[enum_name] = node
+		# function pointer (we will not have pointer to here, because we did get_base_type)
+		elif node.kind == TypeKind.FUNCTIONPROTO:
+			if name_for_func is None:
+				name_for_func = f'anon_func_{self._anonymous_function_count}'
+				self._anonymous_function_count += 1
+			else:
+				name_for_func += '_func'
+			ti = self.get_typedef_info(name_for_func, node)
+			self.collect_type_ti(ti)
+			return ti.new_name + '*'
+		elif node.kind == TypeKind.MEMBERPOINTER:
+			# not implemented
+			raise Exception('anonymous member pointer not supported')
 		
-		elif node.kind in (TypeKind.FUNCTIONPROTO, TypeKind.FUNCTIONNOPROTO, TypeKind.MEMBERPOINTER) or not node.is_pod():
-			raise Exception(f'Cannot collect type {node.spelling} {node.kind}')
+		return friendly_name
 	
 	def collect_var_or_field(self, var_decl: Cursor, class_name: str | None = None):
-		collect_type = True
-		if get_base_type(var_decl.type).kind == TypeKind.FUNCTIONPROTO:
-			func_name = self.append_namespace(f'{var_decl.spelling}_func', class_name)
-			self.collect_type_ti(TypedefInfo(func_name, var_decl.type, 'code*'))
-			collect_type = False
+		var_name = self.append_namespace(var_decl.spelling, class_name)
+		self.collect_type(var_decl.type, var_name)
 		
-		# field
 		if var_decl.kind == CursorKind.FIELD_DECL:
-			if collect_type:
-				self.collect_type(var_decl.type)
 			return
 		
-		# var
-		if collect_type:
-			self.collect_type(var_decl.type)
-		var_name = self.append_namespace(var_decl.spelling, class_name)
 		vi = VarInfo(var_name, var_decl, class_name is not None)
 		if vi.mangled_name in self.static_vars:
 			raise Exception(f'Duplicate var {vi.name} {vi.mangled_name} {var_decl.location}')
@@ -517,13 +560,13 @@ class ParseResults:
 
 	def collect_function_info(self, node: Cursor, ci: ClassInfo | None = None):
 		class_name = None if ci is None else ci.name
-		fi = FunctionInfo(class_name, node)
+		ti = self.get_typedef_info('', node)
+		fi = FunctionInfo(class_name, node, ti)
 		if fi.is_consteval:
 			return # the function won't exist in compiled code
 			
 		if ci is None and self._namespace is not None:
 			fi.name = f'{self._namespace}::{fi.name}'
-		self.collect_func_referenced_types(fi.clang_type)
 		if fi.is_static:
 			if fi.mangled_name in self.function_defs:
 				raise Exception(f'Duplicate function def {fi.name} {fi.mangled_name}')

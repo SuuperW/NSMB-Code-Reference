@@ -12,6 +12,7 @@ import parse_symbols_file
 from header_parser import (
 	ClassInfo,
 	FunctionInfo,
+	FunctionTypedefInfo,
 	ParseResults,
 	TypedefInfo,
 	VarInfo,
@@ -194,13 +195,12 @@ class TypeGenerator:
 	def create_typedef(self, tdef_info: TypedefInfo) -> bool:
 		name = tdef_info.new_name
 		if name in self.done_typedefs:
-			raise Exception("TODO")
-			return True
+			raise Exception(f'typedef {tdef_info.new_name} was already created')
 		
 		_func = None
-		if tdef_info.old_name == 'code*':
+		if isinstance(tdef_info, FunctionTypedefInfo):
 			try:
-				_func = self.create_function_type(name + '_func', get_base_type(tdef_info.renamed_type))
+				_func = self.create_function_type(name + '_func', tdef_info)
 				_func = self.type_manager.getPointer(_func)
 			except UnknownGhidraTypeException as e:
 				return False
@@ -209,9 +209,9 @@ class TypeGenerator:
 		cat = CategoryPath('/' + str.join('/', space_names[:-1]))
 		name = space_names[-1]
 		
-		dataType = _func or self.get_ghidra_type(tdef_info.renamed_type, True)
+		dataType = _func or self.get_ghidra_type(tdef_info.old_name, True)
 		if dataType is None:
-			if tdef_info.renamed_type.kind == TypeKind.TYPEDEF and tdef_info.old_name not in self.done_typedefs:
+			if tdef_info.old_name not in self.done_typedefs:
 				return False
 			else:
 				raise Exception(f'Could not get Ghidra type {tdef_info.old_name} for typedef {name}')
@@ -221,11 +221,11 @@ class TypeGenerator:
 		self.type_manager.addDataType(typedef, conflict_handler)
 		return True
 	
-	def create_function_type(self, name: str, clang_func_type: Type, param_names = None):
+	def create_function_type(self, name: str, func_type: Type | FunctionTypedefInfo, param_names = None):
 		"""
 		Makes a Function data type, for the type manager.
 		"""
-		assert clang_func_type.kind == TypeKind.FUNCTIONPROTO
+		assert isinstance(func_type, FunctionTypedefInfo) or func_type.kind == TypeKind.FUNCTIONPROTO
 		
 		space_names = name.split('::')
 		cat = CategoryPath('/' + str.join('/', space_names[:-1]))
@@ -233,25 +233,53 @@ class TypeGenerator:
 		
 		fp_args = []
 		i = 0
-		for arg in clang_func_type.argument_types():
-			fp_args.append(ParameterDefinitionImpl(
-				param_names[i] if param_names else None,
-				self.get_ghidra_type(arg),
-				None # comment
-			))
-			i += 1
+		if isinstance(func_type, FunctionTypedefInfo):
+			for i in range(len(func_type.param_types)):
+				fp_args.append(ParameterDefinitionImpl(
+					func_type.param_names[i] if func_type.param_names else None,
+					self.get_ghidra_type(func_type.param_types[i]),
+					None # comment
+				))
+				i += 1
+		else:
+			for arg in func_type.argument_types():
+				fp_args.append(ParameterDefinitionImpl(
+					param_names[i] if param_names else None,
+					self.get_ghidra_type(arg),
+					None # comment
+				))
+				i += 1
 		
-		func_type = FunctionDefinitionDataType(cat, name)
-		func_type.setArguments(*fp_args)
-		func_type.setReturnType(self.get_ghidra_type(clang_func_type.get_result()))
-		func_type.setCallingConvention(CompilerSpec.CALLING_CONVENTION_default)
+		ghidra_func_type = FunctionDefinitionDataType(cat, name)
+		ghidra_func_type.setArguments(*fp_args)
+		if isinstance(func_type, FunctionTypedefInfo):
+			ghidra_func_type.setReturnType(self.get_ghidra_type(func_type.return_type))
+		else:
+			ghidra_func_type.setReturnType(self.get_ghidra_type(func_type.get_result()))
+		ghidra_func_type.setCallingConvention(CompilerSpec.CALLING_CONVENTION_default)
 		
-		return self.type_manager.addDataType(func_type, conflict_handler)
+		return self.type_manager.addDataType(ghidra_func_type, conflict_handler)
 	
 	def get_ghidra_type(self, clang_or_str: Type | str, allow_none: bool = False) -> DataType | None:
 		if isinstance(clang_or_str, str):
 			name = clang_or_str
+			if not name[0] == '/':
+				name = '/' + name.replace('::', '/')
 			ghidra_type = self.type_manager.getDataType(name)
+			if ghidra_type is None:
+				if name.endswith('*'):
+					base_type = self.get_ghidra_type(name[:-1])
+					if base_type is not None:
+						ghidra_type = self.type_manager.getPointer(base_type)
+				elif name.endswith(']'):
+					ab_index = name.rindex('[')
+					base_type = self.get_ghidra_type(name[:ab_index])
+					if base_type is not None:
+						size_str = name[ab_index+1:-1]
+						asize = int(size_str) if len(size_str) > 0 else 0
+						ghidra_type = ArrayDataType(base_type, asize)
+				if ghidra_type is not None:
+					self.type_manager.addDataType(ghidra_type, conflict_handler)
 			if not allow_none and ghidra_type is None:
 				raise UnknownGhidraTypeException(f'Cannot get ghidra type {name}')
 			return ghidra_type
@@ -342,7 +370,7 @@ class TypeGenerator:
 			for method in vtable_methods:
 				func_type = self.get_ghidra_type('/' + method.name.replace('::', '/'), True)
 				if func_type is None:
-					func_type = self.create_function_type(method.name, method.clang_type, method.param_names)
+					func_type = self.create_function_type(method.name, method.typedef)#, method.param_names)
 				func_ptr_type = self.type_manager.getPointer(func_type)
 				if '::~' in method.name:
 					# vtables contain destructors D1 then D0
@@ -515,7 +543,7 @@ class SymbolGenerator:
 		else:
 			func.setCallingConvention(CompilerSpec.CALLING_CONVENTION_default)
 		func.setParentNamespace(parent_namespace)
-		func.setReturnType(self.get_ghidra_type(fi.clang_type.get_result()), SourceType.USER_DEFINED)
+		func.setReturnType(self.get_ghidra_type(fi.typedef.return_type), SourceType.USER_DEFINED)
 		
 		# Function parameters are hard. Because Ghidra thinks registers should not be used for >4 byte params.
 		# And when any params have custom storage, all of them have to.
@@ -535,17 +563,17 @@ class SymbolGenerator:
 			owning_type_name = str.join('/', fi.name.split('::')[:-1])
 			owning_type = self.get_ghidra_type('/' + owning_type_name)
 			reg_num += basic_add_param('this', self.type_manager.getPointer(owning_type))
-		for param in fi.clang_type.argument_types():
+		for param in fi.typedef.param_types:
 			param_type = self.get_ghidra_type(param)
 			registers_used = (param_type.getLength() + 3) >> 2
 			if reg_num < 4 and registers_used + reg_num > 4:
 				# Further, Ghidra won't allow partial register storage. SO WE GOTTA SPLIT IT UP.
 				vars_made = 0
 				while vars_made < registers_used:
-					reg_num += basic_add_param(f'{fi.param_names[i]}_{vars_made}', self.get_ghidra_type('/u32'))
+					reg_num += basic_add_param(f'{fi.typedef.param_names[i]}_{vars_made}', self.get_ghidra_type('/u32'))
 					vars_made += 1
 			else:
-				reg_num += basic_add_param(fi.param_names[i], param_type)
+				reg_num += basic_add_param(fi.typedef.param_names[i], param_type)
 			i += 1
 		func.replaceParameters(
 			Function.FunctionUpdateType.CUSTOM_STORAGE, # CUSTOM_STORAGE, DYNAMIC_STORAGE_ALL_PARAMS
@@ -572,15 +600,15 @@ class SymbolGenerator:
 				if address is None:
 					return
 				del self.symbols_arm9[mangled_name]
-				tor = self._create_listing_function(fi, address)
+				func = self._create_listing_function(fi, address)
 				found_any = True
 				if variant is not None:
-					comment = tor.getRepeatableComment()
+					comment = func.getRepeatableComment()
 					if comment is None:
 						comment = variant
 					else:
 						comment = f'{comment}, {variant}'
-					tor.setRepeatableComment(comment)
+					func.setRepeatableComment(comment)
 		if self.report_symbols and not found_any and not fi.is_maybe_inline:
 			print(f'function {fi.name} mangled to {fi.mangled_name} and has no link location')
 	
@@ -613,14 +641,29 @@ class SymbolGenerator:
 	def get_ghidra_type(self, clang_or_str: Type | str, allow_none: bool = False) -> DataType | None:
 		if isinstance(clang_or_str, str):
 			name = clang_or_str
+			if not name[0] == '/':
+				name = '/' + name.replace('::', '/')
 			ghidra_type = self.type_manager.getDataType(name)
 			if ghidra_type is None:
 				ghidra_type = self.type_source.getDataType(name)
-				if ghidra_type is None:
-					if not allow_none:
-						raise UnknownGhidraTypeException(f'Cannot get ghidra type {name}')
-					return None
-				ghidra_type = self.type_manager.addDataType(ghidra_type, conflict_handler)
+				if ghidra_type is not None:
+					ghidra_type = self.type_manager.addDataType(ghidra_type, conflict_handler)
+			if ghidra_type is None:
+				if name.endswith('*'):
+					base_type = self.get_ghidra_type(name[:-1])
+					if base_type is not None:
+						ghidra_type = self.type_manager.getPointer(base_type)
+				elif name.endswith(']'):
+					ab_index = name.rindex('[')
+					base_type = self.get_ghidra_type(name[:ab_index])
+					if base_type is not None:
+						size_str = name[ab_index+1:-1]
+						asize = int(size_str) if len(size_str) > 0 else 0
+						ghidra_type = ArrayDataType(base_type, asize)
+				if ghidra_type is not None:
+					self.type_manager.addDataType(ghidra_type, conflict_handler)
+			if not allow_none and ghidra_type is None:
+				raise UnknownGhidraTypeException(f'Cannot get ghidra type {name}')
 			return ghidra_type
 		
 		assert isinstance(clang_or_str, Type)
