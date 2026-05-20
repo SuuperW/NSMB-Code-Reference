@@ -112,10 +112,10 @@ class ProgramGenerator:
 		self.program = None
 	
 	def generate(self):
-		print('parsing header files...')
-		self.parse_results = header_parser.parse_project(self.project_root, [])
 		print('parsing symbols...')
 		self.symbols_arm9 = parse_symbols_file.parse_symbols(f'{self.project_root}/symbols9.x')
+		print('parsing header files...')
+		self.parse_results = header_parser.parse_project(self.project_root, [], self.symbols_arm9)
 		if not OPTION_SKIP_TYPES:
 			print('creating Ghidra types...')		
 			self.generate_types()

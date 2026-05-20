@@ -597,9 +597,9 @@ class SymbolGenerator:
 			if mangled_name in self.symbols_arm9:
 				tup = self.symbols_arm9[mangled_name]
 				address = self.resolve_address(tup[0], tup[1])
+				del self.symbols_arm9[mangled_name]
 				if address is None:
 					return
-				del self.symbols_arm9[mangled_name]
 				func = self._create_listing_function(fi, address)
 				found_any = True
 				if variant is not None:
@@ -714,6 +714,7 @@ class SymbolGenerator:
 				print(f'skipping symbol {plain_name} because the type {ghidra_type.getName()} is incomplete')
 				return
 			tup = self.symbols_arm9[mangled_name]
+			del self.symbols_arm9[mangled_name]
 			address = self.resolve_address(tup[0], tup[1])
 			if address is None:
 				return

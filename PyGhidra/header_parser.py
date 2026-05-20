@@ -1,4 +1,5 @@
 from __future__ import annotations
+from collections.abc import Container
 import os
 from pathlib import Path
 import subprocess
@@ -339,6 +340,8 @@ class ParseResults:
 	function_defs: dict[str, FunctionInfo]
 	static_vars: dict[str, VarInfo]
 	
+	_known_symbols: Container[str]
+	
 	# libclang does not handle class templates very well
 	# The template definition does not have a valid type (ok, I guess)
 	# Variables who's type is a template instance have an incomplete type
@@ -357,7 +360,7 @@ class ParseResults:
 	
 	_unsupported_messages: set[str]
 	
-	def __init__(self, tu: TranslationUnit):
+	def __init__(self, tu: TranslationUnit, known_symbols: Container[str]):
 		self.classes = {}
 		self.typedefs = {}
 		self.enums = {}
@@ -365,6 +368,7 @@ class ParseResults:
 		self.function_defs = {}
 		self.static_vars = {}
 		
+		self._known_symbols = known_symbols
 		self._namespace = None
 		self._seen_usrs = set()
 		self._collected_type_decls = set()
@@ -592,10 +596,10 @@ class ParseResults:
 			if project_file:
 				self.collect_type(node.type)
 		elif node.kind == CursorKind.FUNCTION_DECL:
-			if project_file:
+			if project_file or node.mangled_name in self._known_symbols:
 				self.collect_function_info(node)
 		elif node.kind == CursorKind.VAR_DECL:
-			if project_file:
+			if project_file or node.mangled_name in self._known_symbols:
 				self.collect_var_or_field(node)
 		elif node.kind == CursorKind.CLASS_TEMPLATE:
 			if project_file:
@@ -638,6 +642,7 @@ def get_translation_unit(path: str, project_root: str, clang_args: list, return_
 def parse_project(
  project_root: str,
  clang_args: list[str],
+ known_symbols: Container[str] | None = None,
  return_errors: bool = False) -> ParseResults | list[str]:
 	global project_include_path
 	project_include_path = project_root.replace('\\', '/') + '/include/'
@@ -660,6 +665,6 @@ def parse_project(
 	elif len(errors) > 0:
 		raise Exception(f'libclang error(s):\n' + str.join('\n', errors))
 	
-	results = ParseResults(tu)
+	results = ParseResults(tu, known_symbols or set())
 	
 	return results

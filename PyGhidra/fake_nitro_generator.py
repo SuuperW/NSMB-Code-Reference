@@ -153,7 +153,7 @@ def collect_errors():
 	
 	max_iterations = 12
 	i = 0
-	errors = header_parser.parse_project(PROJECT_ROOT, ['-ferror-limit=25'], True)
+	errors = header_parser.parse_project(PROJECT_ROOT, ['-ferror-limit=25'], return_errors=True)
 	while len(errors) != 0 and i < max_iterations:
 		unknown_types_this_iteration = 0
 		for e in errors:
@@ -233,7 +233,7 @@ def collect_errors():
 					
 					record_wrong_size(type_name, expected_size, location)
 
-		errors = header_parser.parse_project(PROJECT_ROOT, ['-ferror-limit=25'], True)
+		errors = header_parser.parse_project(PROJECT_ROOT, ['-ferror-limit=25'], return_errors=True)
 		i += 1
 	if len(errors) != 0:
 		for e in errors:
