@@ -439,6 +439,8 @@ class SymbolGenerator:
 		self.report_symbols = report_symbols
 		self.symbols_arm9 = dict(symbols)
 		self.overlay_spaces = overlay_spaces
+		
+		self.clean_symbols()
 			
 		# Step 3: Create all the functions
 		for name in parse_results.classes:
@@ -464,6 +466,20 @@ class SymbolGenerator:
 		if self.report_symbols and len(self.symbols_arm9) != 0:
 			print('Unused symbols for arm9 (limit 1000):')
 			print([s for s in self.symbols_arm9][:1000])
+	
+	def clean_symbols(self):
+		# I'm not really sure what the proper way to handle `new` and `delete` overloads is.
+		
+		# Sized delete (these will not really exist, any symbol for them should point to the non-sized overload)
+		if '_ZdlPvj' in self.symbols_arm9:
+			del self.symbols_arm9['_ZdlPvj']
+		if '_ZdlPvm' in self.symbols_arm9:
+			del self.symbols_arm9['_ZdlPvm']
+		# The "long" overloads for new are literally the same thing as "int", so Idk why they exist. Again, the symbols point to the same place so we only need one version.
+		if '_Znwm' in self.symbols_arm9:
+			del self.symbols_arm9['_Znwm']
+		if '_Znam' in self.symbols_arm9:
+			del self.symbols_arm9['_Znam']
 	
 	def _create_listing_function(self, fi: FunctionInfo, address: Address) -> Function:
 		parent_namespace, fname = self.get_namespace_for(fi.name, fi.class_member)
