@@ -427,6 +427,7 @@ class SymbolGenerator:
 	tpye_source: DataTypeManager
 	
 	report_symbols: bool
+	doing_update: bool
 	symbols_arm9: dict[str, (int, str)]
 	overlay_spaces: dict[int, AddressSpace]
 	ghidra_namespaces: dict[str, Namespace]
@@ -463,8 +464,10 @@ class SymbolGenerator:
 	  parse_results: ParseResults,
 	  symbols: dict[str, (int, str)],
 	  overlay_spaces: dict[int, AddressSpace],
-	  report_symbols: bool):
+	  report_symbols: bool,
+	  doing_update: bool = False):
 		self.report_symbols = report_symbols
+		self.doing_update = doing_update
 		self.symbols_arm9 = dict(symbols)
 		self.overlay_spaces = overlay_spaces
 		
@@ -518,6 +521,8 @@ class SymbolGenerator:
 			if func.getName(True) == fi.name:
 				if fi.is_ctor or fi.is_dtor:
 					return func # expected
+				elif self.doing_update:
+					pass
 				else:
 					raise Exception(f'??? {fname} {hex(address.getOffset())}')
 			func.setName(fname, SourceType.USER_DEFINED)

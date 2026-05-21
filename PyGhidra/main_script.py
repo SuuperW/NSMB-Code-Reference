@@ -5,6 +5,7 @@
 
 OPTION_DELETE_ON_ERROR = True
 OPTION_SKIP_TYPES = False
+OPTION_UPDATE_SYMBOLS = False
 
 if int(getGhidraVersion()[:2]) < 12:
 	raise Exception('Ghidra versions before 12 are not supported.')
@@ -58,7 +59,7 @@ class ProgramGenerator:
 		if paf is not None:
 			self.project_archive = paf.getDomainObject(locking_object, False, False, monitor)
 		else:
-			if OPTION_SKIP_TYPES:
+			if OPTION_SKIP_TYPES or OPTION_UPDATE_SYMBOLS:
 				raise Exception('OPTION_SKIP_TYPES is on, but types do not exist.')
 			self.project_archive = DataTypeArchiveDB(project_folder, type_archive_name, locking_object)
 		self.project_archive_file = paf
@@ -77,12 +78,15 @@ class ProgramGenerator:
 		self.config = config
 		self._has_reported_symbols = False
 		
-		if Path(f'{self.project_root}/ghidra_files/ghidraData.bin').exists():
-			self._rom_data_path = f'{self.project_root}/ghidra_files/ghidraData.bin'
-		elif Path(f'{self.project_root}/files/ghidraData.bin').exists():
-			self._rom_data_path = f'{self.project_root}/files/ghidraData.bin'
+		if OPTION_UPDATE_SYMBOLS:
+			self._rom_data_path = None
 		else:
-			raise Exception('ghidraData.bin was not found under [project]/files or [project]/ghidra_files')
+			if Path(f'{self.project_root}/ghidra_files/ghidraData.bin').exists():
+				self._rom_data_path = f'{self.project_root}/ghidra_files/ghidraData.bin'
+			elif Path(f'{self.project_root}/files/ghidraData.bin').exists():
+				self._rom_data_path = f'{self.project_root}/files/ghidraData.bin'
+			else:
+				raise Exception('ghidraData.bin was not found under [project]/files or [project]/ghidra_files')
 	
 	def generate_types(self):
 		type_generator = import_libclang.TypeGenerator(this, self.project_type_manager)
@@ -116,14 +120,37 @@ class ProgramGenerator:
 		self.symbols_arm9 = parse_symbols_file.parse_symbols(f'{self.project_root}/symbols9.x')
 		print('parsing header files...')
 		self.parse_results = header_parser.parse_project(self.project_root, [], self.symbols_arm9)
-		if not OPTION_SKIP_TYPES:
+		if (not OPTION_SKIP_TYPES) and (not OPTION_UPDATE_SYMBOLS):
 			print('creating Ghidra types...')		
 			self.generate_types()
 		
-		programs = self.config['programs']
-		for program_name in programs:
-			print(f'creating program "{program_name}"')
-			self.create_program(program_name, programs[program_name])
+		if not OPTION_UPDATE_SYMBOLS:
+			programs = self.config['programs']
+			for program_name in programs:
+				print(f'creating program "{program_name}"')
+				self.create_program(program_name, programs[program_name])
+		else:
+			overlay_spaces = {}
+			overlay_spaces[-1] = currentProgram.getAddressFactory().getDefaultAddressSpace()
+			memory = currentProgram.getMemory()
+			for block in memory.getBlocks():
+				block_name = block.getName()
+				if not block_name.startswith('ov9_'):
+					continue
+				if 'bss' in block_name:
+					continue
+				block_id = int(block_name[4:])
+				overlay_spaces[block_id] = block.getStart().getAddressSpace()
+			
+			symbol_generator = import_libclang.SymbolGenerator(currentProgram, self.project_type_manager)	
+			symbol_generator.generate(
+				self.parse_results,
+				self.symbols_arm9,
+				overlay_spaces,
+				True,
+				True,
+			)
+
 		
 		self.release(True)
 	
