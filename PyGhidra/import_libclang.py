@@ -38,6 +38,7 @@ from ghidra.program.model.data import (
 	BuiltInDataType,
 	BuiltInDataTypeManager,
 	CategoryPath,
+	Composite,
 	DataType,
 	DataTypeConflictHandler,
 	DataTypeManager,
@@ -548,12 +549,11 @@ class SymbolGenerator:
 		else:
 			func.setCallingConvention(CompilerSpec.CALLING_CONVENTION_default)
 		func.setParentNamespace(parent_namespace)
-		func.setReturnType(self.get_ghidra_type(fi.typedef.return_type), SourceType.USER_DEFINED)
 		
 		# Function parameters are hard. Because Ghidra thinks registers should not be used for >4 byte params.
 		# And when any params have custom storage, all of them have to.
+		func.setCustomVariableStorage(True)
 		func_params = []
-		i = 0
 		reg_num = 0
 		def basic_add_param(pname: str, dt: DataType):
 			rcount = ((dt.getLength() + 3) >> 2)
@@ -563,11 +563,23 @@ class SymbolGenerator:
 				storage = VariableStorage(self.program, (reg_num - 4) * 4, dt.getLength())
 			func_params.append(ParameterImpl(pname, dt, storage, self.program))
 			return rcount
+		
+		# "result in memory": composite types larger than 4 bytes are returned through a pointer in an extra hidden parameter at r0
+		ghidra_return_type = self.get_ghidra_type(fi.typedef.return_type)
+		result_in_memory = isinstance(ghidra_return_type, Composite) and ghidra_return_type.getLength() > 4
+		if result_in_memory:
+			# Ghidra will show this storage as invalid, but not throw. I don't see any API methods that allow specifying the storage contains a pointer to the type, as auto-storage does.
+			func.setReturn(ghidra_return_type, self.var_storage[0 << 8 | 1], SourceType.USER_DEFINED)
+			reg_num += basic_add_param('_return_ptr_', self.get_ghidra_type(fi.typedef.return_type + '*'))
+		else:
+			func.setReturnType(ghidra_return_type, SourceType.USER_DEFINED)
+		
 		# With custom storage params, we need to expicitly include the this param!
 		if fi.is_thiscall:
 			owning_type_name = str.join('/', fi.name.split('::')[:-1])
 			owning_type = self.get_ghidra_type('/' + owning_type_name)
 			reg_num += basic_add_param('this', self.type_manager.getPointer(owning_type))
+		i = 0
 		for param in fi.typedef.param_types:
 			param_type = self.get_ghidra_type(param)
 			registers_used = (param_type.getLength() + 3) >> 2
