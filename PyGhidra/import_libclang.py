@@ -572,7 +572,7 @@ class SymbolGenerator:
 			func.setReturn(ghidra_return_type, self.var_storage[0 << 8 | 1], SourceType.USER_DEFINED)
 			reg_num += basic_add_param('_return_ptr_', self.get_ghidra_type(fi.typedef.return_type + '*'))
 		else:
-			func.setReturnType(ghidra_return_type, SourceType.USER_DEFINED)
+			func.setReturn(ghidra_return_type, self.var_storage[0 << 8 | 1], SourceType.USER_DEFINED)
 		
 		# With custom storage params, we need to expicitly include the this param!
 		if fi.is_thiscall:
