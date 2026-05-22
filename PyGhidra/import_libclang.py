@@ -623,7 +623,7 @@ class SymbolGenerator:
 					comment = func.getRepeatableComment()
 					if comment is None:
 						comment = variant
-					else:
+					elif variant not in comment:
 						comment = f'{comment}, {variant}'
 					func.setRepeatableComment(comment)
 		if self.report_symbols and not found_any and not fi.is_maybe_inline:
