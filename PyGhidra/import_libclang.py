@@ -32,7 +32,7 @@ from ghidra.app.cmd.disassemble import DisassembleCommand
 from ghidra.app.script import GhidraScript
 from ghidra.app.services import DataTypeManagerService
 from ghidra.program.flatapi import FlatProgramAPI
-from ghidra.program.model.address import Address, AddressSet, AddressSpace
+from ghidra.program.model.address import Address, AddressFactory, AddressSet, AddressSpace
 from ghidra.program.model.data import (
 	ArrayDataType,
 	BuiltInDataType,
@@ -56,6 +56,7 @@ from ghidra.program.model.data import (
 from ghidra.program.model.lang import CompilerSpec
 from ghidra.program.model.listing import Function, FunctionManager, Listing, ParameterImpl, Program, VariableStorage
 from ghidra.program.model.mem import Memory
+from ghidra.program.model.pcode import Varnode
 from ghidra.program.model.symbol import Namespace, SourceType, SymbolTable
 
 from clang.cindex import Cursor, CursorKind, Type, TypeKind
@@ -421,8 +422,9 @@ class SymbolGenerator:
 	listing: Listing
 	flat_api: FlatProgramAPI
 	symbol_table: SymbolTable
-	var_storage: dict[int, VariableStorage]
 	mem: Memory
+	address_factory: AddressFactory
+	param_varnodes: list[Varnode]
 	
 	type_manager: DataTypeManager
 	tpye_source: DataTypeManager
@@ -440,6 +442,7 @@ class SymbolGenerator:
 		self.flat_api = FlatProgramAPI(self.program)
 		self.symbol_table = self.program.getSymbolTable()
 		self.mem = self.program.getMemory()
+		self.address_factory = self.program.getAddressFactory()
 		
 		self.type_manager = self.program.getDataTypeManager()
 		self.type_source = type_source
@@ -452,14 +455,12 @@ class SymbolGenerator:
 		r1 = self.program.getRegister('r1')
 		r2 = self.program.getRegister('r2')
 		r3 = self.program.getRegister('r3')
-		param_registers = [r0, r1, r2, r3]
-		self.var_storage = {}
-		for i in range(4):
-			# Ghidra won't allow partial register storage, so some of these will be invalid and we won't use them.
-			self.var_storage[i << 8 | 1] = VariableStorage(self.program, param_registers[i])
-			self.var_storage[i << 8 | 2] = VariableStorage(self.program, *param_registers[i:i+2])
-			self.var_storage[i << 8 | 3] = VariableStorage(self.program, *param_registers[i:i+3])
-			self.var_storage[i << 8 | 4] = VariableStorage(self.program, *param_registers[i:i+4])
+		self.param_varnodes = [
+			Varnode(r0.getAddress(), 4),
+			Varnode(r1.getAddress(), 4),
+			Varnode(r2.getAddress(), 4),
+			Varnode(r3.getAddress(), 4),
+		]
 	
 	def generate(self,
 	  parse_results: ParseResults,
@@ -557,10 +558,17 @@ class SymbolGenerator:
 		reg_num = 0
 		def basic_add_param(pname: str, dt: DataType):
 			rcount = ((dt.getLength() + 3) >> 2)
-			if reg_num < 4:
-				storage = self.var_storage[reg_num << 8 | rcount]
-			else:
+			if reg_num + rcount <= 4:
+				storage = VariableStorage(self.program, *reversed(self.param_varnodes[reg_num:reg_num+rcount]))
+			elif reg_num >= 4:
 				storage = VariableStorage(self.program, (reg_num - 4) * 4, dt.getLength())
+			else:
+				stack_space = (rcount - (4 - reg_num)) * 4
+				storage = VariableStorage(
+					self.program,
+					Varnode(self.address_factory.getAddress('stack:0'), stack_space),
+					*reversed(self.param_varnodes[reg_num:reg_num+rcount])
+				)
 			func_params.append(ParameterImpl(pname, dt, storage, self.program))
 			return rcount
 		
@@ -569,28 +577,21 @@ class SymbolGenerator:
 		result_in_memory = isinstance(ghidra_return_type, Composite) and ghidra_return_type.getLength() > 4
 		if result_in_memory:
 			# Ghidra will show this storage as invalid, but not throw. I don't see any API methods that allow specifying the storage contains a pointer to the type, as auto-storage does.
-			func.setReturn(ghidra_return_type, self.var_storage[0 << 8 | 1], SourceType.USER_DEFINED)
+			func.setReturn(ghidra_return_type, VariableStorage(self.program, self.param_varnodes[0]), SourceType.USER_DEFINED)
 			reg_num += basic_add_param('_return_ptr_', self.get_ghidra_type(fi.typedef.return_type + '*'))
 		else:
-			func.setReturn(ghidra_return_type, self.var_storage[0 << 8 | 1], SourceType.USER_DEFINED)
+			func.setReturn(ghidra_return_type, VariableStorage(self.program, self.param_varnodes[0]), SourceType.USER_DEFINED)
 		
 		# With custom storage params, we need to expicitly include the this param!
 		if fi.is_thiscall:
 			owning_type_name = str.join('/', fi.name.split('::')[:-1])
 			owning_type = self.get_ghidra_type('/' + owning_type_name)
 			reg_num += basic_add_param('this', self.type_manager.getPointer(owning_type))
+		# Actual params now
 		i = 0
 		for param in fi.typedef.param_types:
 			param_type = self.get_ghidra_type(param)
-			registers_used = (param_type.getLength() + 3) >> 2
-			if reg_num < 4 and registers_used + reg_num > 4:
-				# Further, Ghidra won't allow partial register storage. SO WE GOTTA SPLIT IT UP.
-				vars_made = 0
-				while vars_made < registers_used:
-					reg_num += basic_add_param(f'{fi.typedef.param_names[i]}_{vars_made}', self.get_ghidra_type('/u32'))
-					vars_made += 1
-			else:
-				reg_num += basic_add_param(fi.typedef.param_names[i], param_type)
+			reg_num += basic_add_param(fi.typedef.param_names[i], param_type)
 			i += 1
 		func.replaceParameters(
 			Function.FunctionUpdateType.CUSTOM_STORAGE, # CUSTOM_STORAGE, DYNAMIC_STORAGE_ALL_PARAMS
