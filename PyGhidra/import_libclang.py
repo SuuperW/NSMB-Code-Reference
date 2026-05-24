@@ -590,7 +590,15 @@ class SymbolGenerator:
 		# Actual params now
 		i = 0
 		for param in fi.typedef.param_types:
-			param_type = self.get_ghidra_type(param)
+			# Arrays can be used as a param type, but they are essentially converted to pointers
+			param_name = param
+			is_array = False
+			while param_name.endswith(']'):
+				param_name = param_name[:param_name.rindex('[')]
+				is_array = True
+			if is_array:
+				param_name += '*'
+			param_type = self.get_ghidra_type(param_name)
 			reg_num += basic_add_param(fi.typedef.param_names[i], param_type)
 			i += 1
 		func.replaceParameters(
