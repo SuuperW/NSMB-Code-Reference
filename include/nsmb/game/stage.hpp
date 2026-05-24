@@ -56,6 +56,9 @@
 #include "stage/actors/ov34/fencekoopa.hpp"
 #include "stage/actors/ov34/whomp.hpp"
 
+// Overlay 35 - Skeeter
+#include "stage/actors/ov35/skeeter.hpp"
+
 // Overlay 36 - Snailicorn
 #include "stage/actors/ov36/snailicorn.hpp"
 

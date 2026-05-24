@@ -7253,6 +7253,41 @@ _ZN5Whomp6sBreakE							= 0x021454D4;
 
 _ZTV5Whomp									= 0x02145394;
 
+/* arm9_ov35 */
+/*----------------------------------------------------------------*/
+/*--------------------------- skeeter ----------------------------*/
+/*----------------------------------------------------------------*/
+_ZN7SkeeterC3Ev                                     = 0x02143094;
+_ZN7SkeeterD0Ev                                     = 0x02141ef0;
+_ZN7SkeeterD1Ev                                     = 0x02141e80;
+_ZN7Skeeter8onCreateEv                              = 0x02142e30;
+_ZN7Skeeter9onDestroyEv                             = 0x02142dd0;
+_ZN7Skeeter8onRenderEv                              = 0x02142c74;
+_ZN7Skeeter18onCleanupResourcesEv                   = 0x02142db4;
+_ZN7Skeeter18onPrepareResourcesEv                   = 0x02142dd8;
+_ZN7Skeeter10updateMainEv                           = 0x02142c08;
+_ZN7Skeeter10skipRenderEv                           = 0x02141f6c;
+_ZN7Skeeter10onBlockHitEv                           = 0x02141f68;
+_ZN7Skeeter11onEntityHitEv                          = 0x02142288;
+_ZN7Skeeter13onFireballHitEv                        = 0x02142304;
+_ZN7Skeeter12onStarmanHitEv                         = 0x021421a4;
+_ZN7Skeeter9onMegaHitEv                             = 0x021420cc;
+_ZN7Skeeter12onMegaKickedEv                         = 0x02142188;
+_ZN7Skeeter9onStompedEv                             = 0x021423ac;
+_ZN7Skeeter14onBlueShellHitEv                       = 0x02141fe8;
+_ZN7Skeeter12damagePlayerER14ActiveColliderR6Player = 0x02142420;
+
+_ZN7Skeeter11switchStateEMS_FbvE                    = 0x02142ff8;
+_ZN7Skeeter16getClosestPlayerEPlS0_                 = 0x021424fc;
+
+_ZN7Skeeter12doSkeetStateEv                         = 0x02142944;
+_ZN7Skeeter13dropBombStateEv                        = 0x02142568;
+
+_ZN7Skeeter20offscreenLungeSpeedsE                  = 0x02143a08;
+_ZN7Skeeter19onscreenLungeSpeedsE                   = 0x02143a00;
+
+_ZTV7Skeeter                                        = 0x02143afc;
+
 
 /* arm9_ov36 */
 /*----------------------------------------------------------------*/
