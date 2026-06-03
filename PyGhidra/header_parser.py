@@ -611,7 +611,10 @@ class ParseResults:
 				self.collect(c)
 			self._namespace = old_namespace
 
-def get_translation_unit(path: str, project_root: str, clang_args: list, return_errors: bool = False) -> TranslationUnit:
+def get_translation_unit(path: str, clang_args: list) -> TranslationUnit:
+	arm_root = os.environ.get('NDS-SRE-ARM-ROOT')
+	assert arm_root is not None and Path(arm_root).exists(), f'Environment variable NDS-SRE-ARM-ROOT must be set to an existing directory (is {arm_root})'
+	
 	index = Index.create()
 	all_args = ([]
 		# flags from NCPatcher
@@ -626,26 +629,27 @@ def get_translation_unit(path: str, project_root: str, clang_args: list, return_
 		'-fpack-struct=4', # Align 8-byte ints as 4 bytes
 		'-Wno-pragma-once-outside-header', # We'll directly parse a header, clang will see it is in the main file and thus assume it is 'outside-header'
 		# our includes
-		f'-I{project_root}/include',
-		f'-I{project_root}/nitro_include',
+		f'-I{project_include_path}',
 		# clang includes
-		f'--sysroot={project_root}/LLVM-ET-Arm/lib/clang-runtimes/arm-none-eabi/armv5te',
-		f'-resource-dir={project_root}/LLVM-ET-Arm/lib/clang/18',
+		f'--sysroot={arm_root}/lib/clang-runtimes/arm-none-eabi/armv5te',
+		f'-resource-dir={arm_root}/lib/clang/18',
 	] + clang_args)
 	return index.parse(path, args=all_args)
 
 def parse_project(
- project_root: str,
+ header_file: str,
  clang_args: list[str],
  known_symbols: Container[str] | None = None,
  return_errors: bool = False) -> ParseResults | list[str]:
+	# must use absolute for project_include_path and because we can't get parent of '.'
+	file_to_parse = Path(header_file).absolute()
+	assert file_to_parse.exists()
+	
 	global project_include_path
-	project_include_path = project_root.replace('\\', '/') + '/include/'
+	project_include_path = str(file_to_parse.parent).replace('\\', '/')
 		
 	# scan, collect types
-	file_to_parse = (Path(project_root) / 'ghidra_files'/ 'for_ghidra.h').absolute()
-	assert file_to_parse.exists()
-	tu = get_translation_unit(str(file_to_parse), project_root, [])
+	tu = get_translation_unit(header_file, clang_args)
 	errors = []
 	for diag in tu.diagnostics:
 		# Weird.

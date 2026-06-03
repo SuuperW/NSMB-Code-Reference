@@ -17,7 +17,7 @@ config = {
 			},
 		},
 	},
-	'c_types_to_ignore': ['BitFlag<u32>', 'BitFlag<u8>', 'StrongBitFlag<u32>']
+	'c_types_to_ignore': ['BitFlag<u32>', 'BitFlag<u8>', 'StrongBitFlag<u32>', 'template_hack_1']
 }
 
 # We can probably make do with just the one program above, but you could use these too.

@@ -119,7 +119,11 @@ class ProgramGenerator:
 		print('parsing symbols...')
 		self.symbols_arm9 = parse_symbols_file.parse_symbols(f'{self.project_root}/symbols9.x')
 		print('parsing header files...')
-		self.parse_results = header_parser.parse_project(self.project_root, [], self.symbols_arm9)
+		file_to_parse = (Path(self.project_root) / 'include'/ 'for_ghidra.hpp').absolute()
+		self.parse_results = header_parser.parse_project(
+			str(file_to_parse),
+			[f'-I{self.project_root}/nitro_include'],
+			self.symbols_arm9)
 		if (not OPTION_SKIP_TYPES) and (not OPTION_UPDATE_SYMBOLS):
 			print('creating Ghidra types...')		
 			self.generate_types()
@@ -179,6 +183,8 @@ if __name__ == '__main__':
 	if project_root is None:
 		project_root = askDirectory('source location', 'load').getAbsolutePath()
 	assert Path(project_root).is_dir(), f'The given source directory {project_root} does not exist. '
+	
+	os.environ['NDS-SRE-ARM-ROOT'] = f'{project_root}/LLVM-ET-Arm'
 	
 	config = None
 	has_config = False
