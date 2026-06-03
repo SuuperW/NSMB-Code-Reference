@@ -183,7 +183,7 @@ if __name__ == '__main__':
 	config = None
 	has_config = False
 	config_path = f'{project_root}/ghidra_files/config.py'
-	if Path(config_path).exists:
+	if Path(config_path).exists():
 		spec = importlib.util.spec_from_file_location('config', config_path)
 		config = importlib.util.module_from_spec(spec)
 		spec.loader.exec_module(config)
