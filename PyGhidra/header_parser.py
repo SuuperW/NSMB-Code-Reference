@@ -297,7 +297,7 @@ def get_friendly_name(clang_type: Type, node = None) -> str:
 	elif clang_type.is_pod():
 		tag = clang_type.spelling
 	if tag is not None:
-		if 'anonymous ' in tag:
+		if 'anonymous ' in tag or 'unnamed ' in tag:
 			if tag not in anonymous_names:
 				namespace_prefix = ''
 				if '::' in tag:
