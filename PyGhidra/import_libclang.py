@@ -478,6 +478,8 @@ class SymbolGenerator:
 		# Step 3: Create all the functions
 		for name in parse_results.classes:
 			for method in parse_results.classes[name].methods:
+				if method.is_pure_virtual:
+					continue
 				self.create_listing_function(method)
 		
 		# static functions

@@ -59,6 +59,7 @@ class FunctionInfo:
 	is_thiscall: bool
 	is_static: bool
 	is_virtual: bool
+	is_pure_virtual: bool
 	is_ctor: bool
 	is_dtor: bool
 	is_maybe_inline: bool
@@ -85,6 +86,7 @@ class FunctionInfo:
 		# Note: libclang will report non-virtual if the virtual specifier is not present.
 		# This is not a problem for us, since the subclass's method will be found when listing virtual methods.
 		self.is_virtual = node.is_virtual_method()
+		self.is_pure_virtual = node.is_pure_virtual_method()
 		self.is_ctor = node.kind == CursorKind.CONSTRUCTOR
 		self.is_dtor = node.kind == CursorKind.DESTRUCTOR
 		
