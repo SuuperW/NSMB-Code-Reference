@@ -206,28 +206,23 @@ class VarInfo:
 
 # --- Project path stuff
 project_include_path = ''
-def is_project_file(path: str) -> bool:
-	# Using pathlib to more properly check paths is very slow (since we'll be doing this many thousands of times)
-	# This works.
-	# It use to work without doing this replace. But at some point the paths I got from clang Cursor.location started including a mix of / and \ (even ignoring everything up to /include/) ... weird.
-	path = path.replace('\\', '/')
-	return path.startswith(project_include_path)
 def is_in_project_file(cursor: Cursor) -> bool:
 	loc = cursor.location
 	if bool(loc.file):
-		fname = str(loc.file.name)
-		return is_project_file(fname)
+		# libclang is not consistent with paths being relative/absolute nor with which slash is used
+		fname = get_full_path(str(loc.file)).replace('\\', '/')
+		return fname.startswith(project_include_path)
 	return False
 
 path_map = {}
 def get_full_path(path: str):
+	# Using pathlib to more properly check paths is very slow (since we'll be doing this many thousands of times)
+	# This works.
 	mapped = path_map.get(path)
 	if mapped is None:
 		mapped = str(Path(path).resolve()) # stats file; slow
 		path_map[path] = mapped
 	return mapped
-def get_node_file(node: Cursor):
-	return get_full_path(str(node.location.file))
 
 # --- Clang type + name helpers
 pointer_types = (TypeKind.POINTER, TypeKind.LVALUEREFERENCE, TypeKind.RVALUEREFERENCE)
