@@ -295,12 +295,12 @@ def get_friendly_name(clang_type: Type, node = None) -> str:
 		return get_friendly_name(clang_type.get_pointee())
 	
 	tag = None
-	if clang_type.is_pod(): # some types above are "plain old data"
-		tag = clang_type.spelling
-	elif clang_type.kind == TypeKind.ENUM:
+	if clang_type.kind == TypeKind.ENUM:
 		tag = clang_type.spelling.replace('enum ', '')
 	elif is_class_type(clang_type):
 		tag = clang_type.spelling.replace('struct ', '').replace('union ', '')
+	elif clang_type.is_pod():
+		tag = clang_type.spelling
 	if tag is not None:
 		if 'anonymous ' in tag:
 			if tag not in anonymous_names:
