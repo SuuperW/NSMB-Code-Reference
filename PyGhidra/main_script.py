@@ -122,7 +122,10 @@ class ProgramGenerator:
 		file_to_parse = (Path(self.project_root) / 'include'/ 'for_ghidra.hpp').absolute()
 		self.parse_results = header_parser.parse_project(
 			str(file_to_parse),
-			[f'-I{self.project_root}/nitro_include'],
+			[
+				'-std=c++23',
+				f'-I{self.project_root}/nitro_include',
+			],
 			self.symbols_arm9)
 		if (not OPTION_SKIP_TYPES) and (not OPTION_UPDATE_SYMBOLS):
 			print('creating Ghidra types...')		

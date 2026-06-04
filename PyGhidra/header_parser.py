@@ -617,15 +617,19 @@ def get_translation_unit(path: str, clang_args: list) -> TranslationUnit:
 	arm_root = os.environ.get('NDS-SRE-ARM-ROOT')
 	assert arm_root is not None and Path(arm_root).exists(), f'Environment variable NDS-SRE-ARM-ROOT must be set to an existing directory (is {arm_root})'
 	
+	language = 'c'
+	if path.endswith('pp'):
+		language = 'c++'
+	
 	index = Index.create()
 	all_args = ([]
 		# flags from NCPatcher
 		+ '-mcpu=arm946e-s -mno-unaligned-access -mfloat-abi=soft -mabi=aapcs'.split(' ')
 		+ '-Os -fno-short-enums -fomit-frame-pointer -ffast-math -fno-builtin -nostdlib -nodefaultlibs -DSDK_GCC -DSDK_FINALROM'.split(' ')
-		+ '-fno-rtti -fno-exceptions -std=c++23'.split(' ')
+		+ '-fno-rtti -fno-exceptions'.split(' ')
 		+ [
 		'-DSDK_ARM9', # This isn't in the .json file given in the NSMB template for NCPatcher, but seems necessary. Does NCPatcher automatically include it?
-		'-x', 'c++', # language
+		'-x', language,
 		'-target', 'arm-none-eabi',
 		'-fsyntax-only',
 		'-fpack-struct=4', # Align 8-byte ints as 4 bytes
