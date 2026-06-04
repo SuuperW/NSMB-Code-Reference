@@ -124,6 +124,7 @@ class ProgramGenerator:
 			str(file_to_parse),
 			[
 				'-std=c++23',
+				'-DSDK_GCC', # NSMB-CR's nitro SDK modifying script introduces this ... no idea why
 				f'-I{self.project_root}/nitro_include',
 			],
 			self.symbols_arm9)

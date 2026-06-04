@@ -625,7 +625,7 @@ def get_translation_unit(path: str, clang_args: list) -> TranslationUnit:
 	all_args = ([]
 		# flags from NCPatcher
 		+ '-mcpu=arm946e-s -mno-unaligned-access -mfloat-abi=soft -mabi=aapcs'.split(' ')
-		+ '-Os -fno-short-enums -fomit-frame-pointer -ffast-math -fno-builtin -nostdlib -nodefaultlibs -DSDK_GCC -DSDK_FINALROM'.split(' ')
+		+ '-Os -fno-short-enums -fomit-frame-pointer -ffast-math -fno-builtin -nostdlib -nodefaultlibs -DSDK_FINALROM'.split(' ')
 		+ '-fno-rtti -fno-exceptions'.split(' ')
 		+ [
 		'-DSDK_ARM9', # This isn't in the .json file given in the NSMB template for NCPatcher, but seems necessary. Does NCPatcher automatically include it?
