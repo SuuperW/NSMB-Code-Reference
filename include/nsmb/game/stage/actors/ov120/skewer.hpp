@@ -92,7 +92,7 @@ public:
 	static u32 syncTimer;
 
 
-	Direction direction; // Based on actor ID, see enum above.
+	Direction skewerDirection; // Based on actor ID, see enum above.
 	u8 distanced; // 0 if actors 216-219, 1 if actors 220-223.
 	Model model;
 	ActiveCollider pillarCollider; // Rectangle ActiveCollider for the Skewer pillar.

@@ -696,7 +696,7 @@ public:
 	s32 groundRemovedTimer;
 	u32 pipeType;
 	u32 prevAnimID;
-	PushSide sidesPushed;
+	PushSide playerSidesPushed;
 	TileType bottomTileType;
 	TileType lastBottomTileType;
 

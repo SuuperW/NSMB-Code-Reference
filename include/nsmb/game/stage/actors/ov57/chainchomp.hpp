@@ -131,7 +131,7 @@ public:
 	bool restLandedFlag;
 	bool aimingFlag;
 	u8 jumpsLeft;
-	u8 playerCollisionCooldown;
+	u8 chompPlayerCollisionCooldown;
 
 
 #if NTR_EXT_EXISTS(ChainChomp)

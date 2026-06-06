@@ -181,7 +181,7 @@ public:
 	u32 velocityMask;
 	u32 velocityMax;
 	u32 velocityAttenuation;
-	CoinType type;
+	CoinType coinType;
 	u32 layerFlag;
 
 	u16 blockFloatCooldown;

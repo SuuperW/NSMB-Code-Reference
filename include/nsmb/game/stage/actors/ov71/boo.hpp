@@ -179,7 +179,7 @@ public:
 	u32 unused55C;								// Unused
 
 	// Actor settings
-	Type type;									// Boo type
+	Type booType;								// Boo type
 	u32 balloonFlag;							// 1 if the Boo is a Balloon Boo
 	SpeedType speedType;						// Current Boo velocity index
 	u32 balloonBehavior;						// Not 0 if the Balloon Boo chases the player like a regular Boo

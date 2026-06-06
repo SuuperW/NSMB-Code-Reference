@@ -129,7 +129,7 @@ public:
 	static const StateFunction renderFunctions[6];
 
 
-	Type type;
+	Type stageFxType;
 	Type initialType;
 
 	u32 step;
