@@ -99,6 +99,7 @@ enum class ObjectClassID : u16 {
 	WobbleRock = 170,
 	BigSpikedBall = 185,
 	Manhole = 187,
+	SnowBank = 200,
 	TileGod = 206,
 	SkewerDown = 216,
 	SkewerUp = 217,

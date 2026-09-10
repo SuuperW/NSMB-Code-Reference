@@ -116,6 +116,9 @@
 // Overlay 108 - Broozer
 #include "stage/actors/ov108/broozer.hpp"
 
+// Overlay 116 - SnowBank
+#include "stage/actors/ov116/snowbank.hpp"
+
 // Overlay 120 - Skewer
 #include "stage/actors/ov120/skewer.hpp"
 
