@@ -2697,14 +2697,23 @@ _ZTVN8Particle7HandlerE																						= 0x0203cf84;
 /*----------------------------------------------------------------*/
 /*------------------------- boot scene ---------------------------*/
 /*----------------------------------------------------------------*/
-//_ZN9BootSceneC3Ev                               = 0x02187208;
-//_ZN9BootSceneD0Ev                               = 0x02186680;
-//_ZN9BootSceneD1Ev                               = 0x02186660;
-//_ZN9BootScene8onCreateEv                        = 0x02186eb0;
-//_ZN9BootScene9onDestroyEv                       = 0x02186ea8;
-//_ZN9BootScene18onCleanupResourcesEv             = 0x02186ea4;
-//_ZN9BootScene8onRenderEv                        = 0x02186e9c;
-//_ZN9BootScene8onUpdateEv                        = 0x02186900;
+_ZN9BootSceneC3Ev                               = 0x020cce88;
+_ZN9BootSceneD0Ev                               = 0x020cc300;
+_ZN9BootSceneD1Ev                               = 0x020cc2e0;
+_ZN9BootScene8onCreateEv                        = 0x020ccb30;
+_ZN9BootScene9onDestroyEv                       = 0x020ccb28;
+_ZN9BootScene18onCleanupResourcesEv             = 0x020ccb24;
+_ZN9BootScene8onRenderEv                        = 0x020ccb1c;
+_ZN9BootScene8onUpdateEv                        = 0x020cc580;
+
+_ZN9BootScene15nintendoLogoNCGE                 = 0x020cd144;
+_ZN9BootScene15nintendoLogoNCLE                 = 0x020cd734;
+_ZN9BootScene15nintendoLogoNSCE                 = 0x020cd934;
+_ZN9BootScene16copyrightTextNCGE                = 0x020cdb24;
+_ZN9BootScene16copyrightTextNCLE                = 0x020ce84c;
+_ZN9BootScene16copyrightTextNSCE                = 0x020ce86c;
+
+_ZTV9BootScene                                  = 0x020cd0f0;
 
 /* arm9_ov10 */
 /*----------------------------------------------------------------*/
@@ -3214,6 +3223,27 @@ _ZN14WorldMapCamera7profileE              = 0x020E8BEC;
 
 _ZTV14WorldMapCamera                      = 0x020E8C3C;
 
+/* arm9_ov8 */
+/*----------------------------------------------------------------*/
+/*---------------------- worldmap enitity ------------------------*/
+/*----------------------------------------------------------------*/
+_ZN19WorldmapEntityModelC1Ev                        = 0x020dc1bc;
+_ZN19WorldmapEntityModelD0Ev                        = 0x020dc13c;
+_ZN19WorldmapEntityModelD1Ev                        = 0x020dc180;
+_ZN19WorldmapEntityModel6createENS_4TypeE           = 0x020dbfe0;
+_ZN19WorldmapEntityModel6renderEP7MtxFx43P4Vec3S3_  = 0x020dbdf8;
+_ZN19WorldmapEntityModel6updateEv                   = 0x020dbdd0;
+_ZN19WorldmapEntityModel12setAnimationEm            = 0x020dbd60;
+_ZN19WorldmapEntityModel9loadFilesEv                = 0x020dbc88;
+
+_ZN19WorldmapEntityModel16shadowAnimationsE         = 0x020ee7e0;
+_ZN19WorldmapEntityModel16entityAnimationsE         = 0x020ee7e8;
+_ZN19WorldmapEntityModel14texPaletteBaseE           = 0x020ee7dc;
+_ZN19WorldmapEntityModel16texPaletteOffsetE         = 0x020e2e54;
+_ZN19WorldmapEntityModel15resourceFileIDsE          = 0x020e9940;
+
+_ZTV19WorldmapEntityModel                           = 0x020e9958 - 8;
+
 /*----------------------------------------------------------------*/
 /*----------------------- worldmap actor -------------------------*/
 /*----------------------------------------------------------------*/
@@ -3227,7 +3257,7 @@ _ZN13WorldmapActor8onRenderEv             = 0x020d7734;
 _ZN13WorldmapActor18onCleanupResourcesEv  = 0x020d81cc;
 _ZN13WorldmapActor18onPrepareResourcesEv  = 0x020e96bc;
 
-_ZTV13WorldmapActor                       = 0x020E9680;
+_ZTV13WorldmapActor                       = 0x020E9680 - 8;
 
 
 /*----------------------------------------------------------------*/
@@ -8467,6 +8497,17 @@ _ZN7Broozer7profileE									= 0x0218AEF0;
 
 _ZTV7Broozer											= 0x0218AEFC;
 
+/* arm9_ov116 */
+/*----------------------------------------------------------------*/
+/*--------------------------- snowbank ---------------------------*/
+/*----------------------------------------------------------------*/
+_ZN8SnowBankD0Ev                       = 0x0218cc6c;
+_ZN8SnowBankD1Ev                       = 0x0218cb8c;
+_ZN8SnowBank8onRenderEv                = 0x0218cd54;
+_ZN8SnowBank18onPrepareResourcesEv     = 0x0218d650;
+_ZN8SnowBank10updateMainEv             = 0x0218cdf0;
+
+_ZTV8SnowBank                          = 0x0218EFD4 - 8;
 
 /* arm9_ov120 */
 /*----------------------------------------------------------------*/

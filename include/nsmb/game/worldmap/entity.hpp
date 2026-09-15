@@ -3,7 +3,8 @@
 #include <nsmb/core/graphics/3d/modelanm.hpp>
 #include <nsmb/core/graphics/3d/animationctrl.hpp>
 
-// TODO: These addresses are incorrect.
+// overlay 8
+// vtable at 020e9958
 class WorldmapEntityModel
 {
 public:
@@ -21,42 +22,42 @@ public:
 	Type type;							//Type of the entity
 
 
-	//021ae1a0
+	//020ee7e0
 	static u32 shadowAnimations[2];
 
-	//021ae1a8
+	//020ee7e8
 	static u32 entityAnimations[2][2];//Type & ID
 
-	//021ae19c
+	//020ee7dc
 	static u16 texPaletteBase;
 
-	//021a2814
+	//020e2e54
 	static u16 texPaletteOffset[2];
 
-	//021a9300
+	//020e9940
 	static u32 resourceFileIDs[2][2];//Type & Model/Animation
 
 
-	//0219bb7c
+	//020dc1bc
 	WorldmapEntityModel();
 
-	//D0:0219bafc
-	//D1:0219bb40
+	//D0:020dc13c
+	//D1:020dc180
 	virtual ~WorldmapEntityModel();
 
-	//0219b9a0
+	//020dbfe0
 	bool create(Type type);
 
-	//0219b7b8
+	//020dbdf8
 	void render(MtxFx43* modelMatrix, Vec3* scale, Vec3* relPos);//relPos only used by Flying Block (and even there only Y)
 
-	//0219b790
+	//020dbdd0
 	void update();
 
-	//0219b720
+	//020dbd60
 	void setAnimation(u32 animID);
 
-	//0219b648
+	//020dbc88
 	static bool loadFiles();
 
 };

@@ -2,40 +2,38 @@
 
 #include <nsmb/core/entity/scene.hpp>
 
-
 //ov1
-// The addresses of these methods are all wrong. Who knows, maybe the overlay indicated above is also wrong.
-// The entries in symbols9.x have been commented out.
+// vtable at 0x020cd0f0
 class BootScene : public Scene
 {
 public:
 
-	//C3:02187208
+	//C3:020cce88
 	BootScene();
 
-	//D0:02186680
-	//D1:02186660
+	//D0:020cc300
+	//D1:020cc2e0
 	virtual ~BootScene();
 
-	//02186eb0
+	//020ccb30
 	virtual s32 onCreate() override;
 
-	//02186ea8
+	//020ccb28
 	virtual s32 onDestroy() override;
 
-	//02186ea4
+	//020ccb24
 	virtual void onCleanupResources() override;
 
-	//02186e9c
+	//020ccb1c
 	virtual s32 onRender() override;
 
-	//02186900
+	//020cc580
 	virtual s32 onUpdate() override;
 
-	//02186834
+	//020cc4b4
 	//void ? ? ? ();
 
-	//021866a8
+	//020cc328
 	//void ? ? ? ();
 
 	/*
@@ -56,22 +54,22 @@ public:
 	static constexpr u16 UpdatePriority = (u16)ObjectID;
 	static constexpr u16 RenderPriority = 7;
 
-	//021874c4
+	//020cd144
 	static u8 nintendoLogoNCG[0x5F0];
 
-	//02187ab4
+	//020cd734
 	static u8 nintendoLogoNCL[0x200];
 
-	//02187cb4
+	//020cd934
 	static u8 nintendoLogoNSC[0x1F0];
 
-	//02187ea4
+	//020cdb24
 	static u8 copyrightTextNCG[0xD28];
 
-	//02188bcc
+	//020ce84c
 	static u8 copyrightTextNCL[0x20];
 
-	//02188bec
+	//020ce86c
 	static u8 copyrightTextNSC[0x2B8];
 
 	//Save related
