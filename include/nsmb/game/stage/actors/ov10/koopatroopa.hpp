@@ -81,7 +81,7 @@ public:
 	virtual bool onDamageDealt(const Player& player); // when player is damaged by walking koopa... but why virtual??
 
 	// 020de770
-	bool checkDamaged();
+	bool checkDamaged(Player& player);
 	// 020dfb94
 	bool updateBeginShellExit();
 	// 020de1c8
