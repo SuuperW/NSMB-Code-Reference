@@ -16,10 +16,13 @@ def parse_assignment(line):
 	value_str = parts[1][:semicolon].strip()
 	
 	# lines may include MATH
-	if '-' in value_str or '+' in value_str:
-		parts = value_str.split('-') if '-' in value_str else value_str.split('+')
+	minus = '-' in value_str
+	if minus or '+' in value_str:
+		parts = value_str.split('-') if minus else value_str.split('+')
 		base_value = int(parts[0].strip(), 16)
 		operand = int(parts[1].strip())
+		if minus:
+			operand = -operand
 		# and some of that is just +1 meant to indicate THUMB, but Ghidra will fail with that
 		value_int = (base_value + operand) & ~1
 		value_str = hex(value_int)
