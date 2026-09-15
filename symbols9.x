@@ -3220,6 +3220,7 @@ _ZN14WorldMapCamera8setStateEm            = 0x020D16A0;
 _ZN14WorldMapCamera11updateStateEv        = 0x020D162C;
 
 _ZN14WorldMapCamera7profileE              = 0x020E8BEC;
+_ZN14WorldMapCamera13fovySineTableE       = 0x020E8C8C;
 
 _ZTV14WorldMapCamera                      = 0x020E8C3C;
 
@@ -3243,6 +3244,28 @@ _ZN19WorldmapEntityModel16texPaletteOffsetE         = 0x020e2e54;
 _ZN19WorldmapEntityModel15resourceFileIDsE          = 0x020e9940;
 
 _ZTV19WorldmapEntityModel                           = 0x020e9958 - 8;
+
+/*----------------------------------------------------------------*/
+/*----------------------- worldmap player ------------------------*/
+/*----------------------------------------------------------------*/
+_ZN19WorldmapPlayerModelC1Ev                                = 0x020ddd50;
+_ZN19WorldmapPlayerModelD0Ev                                = 0x020ddd00;
+_ZN19WorldmapPlayerModelD1Ev                                = 0x020ddd2c;
+_ZN19WorldmapPlayerModel6createEham                         = 0x020ddc28;
+_ZN19WorldmapPlayerModel6renderEP7MtxFx43P4Vec3             = 0x020ddbb4;
+_ZN19WorldmapPlayerModel6updateEb                           = 0x020ddb90;
+_ZN19WorldmapPlayerModel12setAnimationENS_13AnimationTypeEb = 0x020dda80;
+_ZN19WorldmapPlayerModel16setHeadAnimationEm                = 0x020dd9f8;
+
+_ZN19WorldmapPlayerModel9loadFilesEv                        = 0x020dd21c;
+
+_ZN19WorldmapPlayerModel10animationsE                       = 0x020e4010;
+_ZN19WorldmapPlayerModel16idleAnimationIDsE                 = 0x020e3ffc;
+_ZN19WorldmapPlayerModel16walkAnimationIDsE                 = 0x020e3ff4;
+_ZN19WorldmapPlayerModel15runAnimationIDsE                  = 0x020e3fec;
+_ZN19WorldmapPlayerModel12modelConfigsE                     = 0x020e4004;
+
+_ZTV19WorldmapPlayerModel                                   = 0x020e9b70 - 8;
 
 /*----------------------------------------------------------------*/
 /*----------------------- worldmap actor -------------------------*/
@@ -3364,6 +3387,9 @@ _ZN13WorldmapScene11textIndicesE                  = 0x020e64ec;
 _ZN13WorldmapScene15lightDirectionsE              = 0x020e6bf0;
 _ZN13WorldmapScene16worldmapMusicIDsE             = 0x020e650c;
 _ZN13WorldmapScene12cameraLimitsE                 = 0x020e6714;
+
+_ZN13WorldmapScene12IconAnimatorC1ENS0_4ModeE     = 0x020d1478;
+_ZN13WorldmapScene12IconAnimator6updateEv         = 0x020d12ac;
 
 /* arm9_ov9 */
 /*----------------------------------------------------------------*/
@@ -5126,6 +5152,7 @@ _ZN5Stage14liquidPositionE							= 0x020cae0c;
 _ZN5Stage18lastLiquidPositionE						= 0x020cadac;
 _ZN5Stage7cameraXE									= 0x020cae1c;
 _ZN5Stage7cameraYE									= 0x020cad94;
+_ZN5Stage11cameraScaleE                             = 0x020cadb4;
 _ZN5Stage11cameraWidthE								= 0x020cada4;
 _ZN5Stage12cameraHeightE							= 0x020cad8c;
 _ZN5Stage20megaInteractionFlagsE					= 0x020ca284;

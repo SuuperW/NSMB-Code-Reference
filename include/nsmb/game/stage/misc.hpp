@@ -49,7 +49,7 @@ namespace Stage
 	extern fx32 cameraY[2];
 
 	// 020cadb4
-	extern fx32 cameraScale; // Suuper: array of 2? Idk why the others are array of 2.
+	extern fx32 cameraScale[2];
 
 	// 020cada4
 	extern fx32 cameraWidth[2];

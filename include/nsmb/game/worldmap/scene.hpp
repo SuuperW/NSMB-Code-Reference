@@ -156,8 +156,10 @@ public:
 		u32 unk10;//Enter stop delay (at 0x15 the oscillation stops if scale == 1.0)
 		Mode unk14;//Mode
 
+		// 0x020d1478
 		IconAnimator(Mode mode);
 
+		// 0x020d12ac
 		void update();
 	};
 

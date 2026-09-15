@@ -32,14 +32,7 @@ public:
 	//0x020E8BEC
 	static ObjectProfile profile;
 
-	// TODO: These three addresses are incorrect.
-	//021a65b0
-	static VecFx32 worldLightPositions[8];
-
-	//021a60d4
-	static fx32 worldBoundaries[8][2];
-
-	//021a864c
+	// 0x020E8C8C
 	static fx32 fovySineTable[450];//I don't wanna say anything to this.
 
 	//C3:0x020D1F98
