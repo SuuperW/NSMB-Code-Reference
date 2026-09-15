@@ -4,8 +4,7 @@
 #@runtime PyGhidra
 
 OPTION_DELETE_ON_ERROR = True
-OPTION_SKIP_TYPES = False
-OPTION_UPDATE_SYMBOLS = False
+OPTION_FORCE_CREATE_PROGRAM = False
 
 if int(getGhidraVersion()[:2]) < 12:
 	raise Exception('Ghidra versions before 12 are not supported.')
@@ -43,6 +42,7 @@ class ProgramGenerator:
 	program: Program | None
 	prog_tid: int
 	all_programs: list[Program]
+	updating: bool
 	
 	_has_reported_symbols: bool
 	_has_released: bool
@@ -78,7 +78,9 @@ class ProgramGenerator:
 		self.config = config
 		self._has_reported_symbols = False
 		
-		if OPTION_UPDATE_SYMBOLS:
+		self.updating = (not OPTION_FORCE_CREATE_PROGRAM) and currentProgram != None
+		
+		if self.updating:
 			self._rom_data_path = None
 		else:
 			if Path(f'{self.project_root}/ghidra_files/ghidraData.bin').exists():
@@ -89,7 +91,7 @@ class ProgramGenerator:
 				raise Exception('ghidraData.bin was not found under [project]/files or [project]/ghidra_files')
 	
 	def generate_types(self):
-		type_generator = import_libclang.TypeGenerator(this, self.project_type_manager)
+		type_generator = import_libclang.TypeGenerator(this, self.project_type_manager, self.updating)
 		type_generator.generate(self.parse_results, self.config['c_types_to_ignore'])
 	
 	def create_program(self, name: str, program_config: dict):
@@ -102,7 +104,7 @@ class ProgramGenerator:
 		
 		report_symbols = (not self._has_reported_symbols) and (not program_config['skip_unloaded_overlays'])
 		
-		symbol_generator = import_libclang.SymbolGenerator(currentProgram, self.project_type_manager)	
+		symbol_generator = import_libclang.SymbolGenerator(self.program, self.project_type_manager)	
 		symbol_generator.generate(
 			self.parse_results,
 			self.symbols_arm9,
@@ -128,11 +130,11 @@ class ProgramGenerator:
 				f'-I{self.project_root}/nitro_include',
 			],
 			self.symbols_arm9)
-		if (not OPTION_SKIP_TYPES) and (not OPTION_UPDATE_SYMBOLS):
-			print('creating Ghidra types...')		
-			self.generate_types()
 		
-		if not OPTION_UPDATE_SYMBOLS:
+		print('creating Ghidra types...')
+		self.generate_types()
+		
+		if not self.updating:
 			programs = self.config['programs']
 			for program_name in programs:
 				print(f'creating program "{program_name}"')
@@ -158,7 +160,7 @@ class ProgramGenerator:
 				True,
 				True,
 			)
-
+			print('You should refresh sync indicators for the data type manager, then update types.')
 		
 		self.release(True)
 	
@@ -203,7 +205,7 @@ if __name__ == '__main__':
 	else:
 		config = {}
 		print('No config file found. Using defaults.')
-
+	
 	program_manager = state.getTool().getService(ProgramManager)
 	g = ProgramGenerator(project_root, config)
 	finished = False

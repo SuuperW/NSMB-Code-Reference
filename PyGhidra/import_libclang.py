@@ -76,11 +76,13 @@ class TypeGenerator:
 	type_manager: DataTypeManager
 	types_to_ignore: list[str]
 	done_typedefs: set[str]
-	done_structs = set[str]
+	done_structs: set[str]
+	updating: bool
 	
-	def __init__(self, script: GhidraScript, type_manager: DataTypeManager):
+	def __init__(self, script: GhidraScript, type_manager: DataTypeManager, updating: bool):
 		self.script = script
 		self.type_manager = type_manager
+		self.updating = updating
 	
 	def generate(self, parse_results: ParseResults, ignore: list[str]):
 		self.types_to_ignore = ignore
@@ -136,7 +138,7 @@ class TypeGenerator:
 				assert ghidra_size == clang_size, f'Incorrect size for {name}. Expected {hex(clang_size)}, got {hex(ghidra_size)}'
 			else:
 				gt.setDescription('Incomplete data type; full definition was not found in header files. There should not be any non-pointer references to this type.')
-	
+		
 	def add_builtin_types(self):
 		bdtm = BuiltInDataTypeManager.getDataTypeManager()
 		cat = CategoryPath('/')
@@ -223,18 +225,20 @@ class TypeGenerator:
 		self.type_manager.addDataType(typedef, conflict_handler)
 		return True
 	
-	def create_function_type(self, name: str, func_type: Type | FunctionTypedefInfo, param_names = None):
+	def create_function_type(self, name: str, func_type: Type | FunctionTypedefInfo, thiscall_type: DataType = None):
 		"""
 		Makes a Function data type, for the type manager.
 		"""
 		assert isinstance(func_type, FunctionTypedefInfo) or func_type.kind == TypeKind.FUNCTIONPROTO
+		assert thiscall_type == None or isinstance(thiscall_type, Pointer)
 		
 		space_names = name.split('::')
 		cat = CategoryPath('/' + str.join('/', space_names[:-1]))
 		name = space_names[-1]
 		
 		fp_args = []
-		i = 0
+		if thiscall_type != None:
+			fp_args.append(ParameterDefinitionImpl('this', thiscall_type, None))
 		if isinstance(func_type, FunctionTypedefInfo):
 			for i in range(len(func_type.param_types)):
 				fp_args.append(ParameterDefinitionImpl(
@@ -242,11 +246,11 @@ class TypeGenerator:
 					self.get_ghidra_type(func_type.param_types[i]),
 					None # comment
 				))
-				i += 1
 		else:
+			i = 0
 			for arg in func_type.argument_types():
 				fp_args.append(ParameterDefinitionImpl(
-					param_names[i] if param_names else None,
+					None,
 					self.get_ghidra_type(arg),
 					None # comment
 				))
@@ -258,7 +262,11 @@ class TypeGenerator:
 			ghidra_func_type.setReturnType(self.get_ghidra_type(func_type.return_type))
 		else:
 			ghidra_func_type.setReturnType(self.get_ghidra_type(func_type.get_result()))
-		ghidra_func_type.setCallingConvention(CompilerSpec.CALLING_CONVENTION_default)
+		
+		if thiscall_type is None:
+			ghidra_func_type.setCallingConvention(CompilerSpec.CALLING_CONVENTION_default)
+		else:
+			ghidra_func_type.setCallingConvention(CompilerSpec.CALLING_CONVENTION_thiscall)
 		
 		return self.type_manager.addDataType(ghidra_func_type, conflict_handler)
 	
@@ -359,20 +367,21 @@ class TypeGenerator:
 		
 		vtable_methods = class_info.vtable_methods()
 		if len(vtable_methods) > 0:
+			ghidra_pointer_type = self.type_manager.getPointer(ghidra_type)
 			vtable_type = self.create_empty_struct(f'{class_info.name}::vtable')
 			vtable_ptr_type = self.type_manager.getPointer(vtable_type)
 			if sub_vtable_type is not None:
 				# Should it stay where it is, or move to index 0? I don't know of a type in NSMB I can check.
 				if sub_vtable_index != 0:
 					print(f'Type {class_info.name} has a vtable not at index 0. Check me.')
-				vtable_type.replaceWith(sub_vtable_type)
+				vtable_type.replaceWith(sub_vtable_type) # replaces components, not the type itself
 				ghidra_type.replace(sub_vtable_index, vtable_ptr_type, 0, 'vtable', None)
 			else:
 				ghidra_type.insert(0, vtable_ptr_type, 0, 'vtable', None)
 			for method in vtable_methods:
 				func_type = self.get_ghidra_type('/' + method.name.replace('::', '/'), True)
-				if func_type is None:
-					func_type = self.create_function_type(method.name, method.typedef)#, method.param_names)
+				if func_type is None or self.updating:
+					func_type = self.create_function_type(method.name, method.typedef, ghidra_pointer_type)
 				func_ptr_type = self.type_manager.getPointer(func_type)
 				if '::~' in method.name:
 					# vtables contain destructors D1 then D0
