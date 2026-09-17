@@ -518,7 +518,7 @@ public:
 	bool applyTileDamage();
 
 	bool switchMainState(StateFunction function, void* arg = nullptr);
-	bool updateMainState();
+	bool updateMainState(void* arg = nullptr);
 	void setMovementState(MoveFunction function);
 	void updateMovementState();
 	void setMetaState(MetaFunction function);

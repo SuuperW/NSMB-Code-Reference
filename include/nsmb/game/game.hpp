@@ -108,6 +108,10 @@ namespace Game
 	extern u32 sceneTimer;
 	// 02088BD8
 	extern u32 actorTimer;
+	// 020CAB14
+	extern int actorTimer2;
+	// 020CA8B4
+	extern fx32 igtDisplay;
 
 	NTR_INLINE void wrapPosition(Vec3& position, bool wrapLeft = true) {
 		wrapFunction(position, wrapLeft);

@@ -97,6 +97,7 @@ enum class ObjectClassID : u16 {
 	Checkpoint = 159,
 	TiltMetalDish = 169,
 	WobbleRock = 170,
+	SeeSaw = 171,
 	BigSpikedBall = 185,
 	Manhole = 187,
 	SnowBank = 200,

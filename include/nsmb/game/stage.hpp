@@ -107,6 +107,9 @@
 #include "stage/actors/ov82/snowball.hpp"
 #include "stage/actors/ov82/snowspike.hpp"
 
+// Overlay 89 - SeeSaw
+#include "stage/actors/ov89/seesaw.hpp"
+
 // Overlay 97 - SwellingGround
 #include "stage/actors/ov97/swellingground.hpp"
 

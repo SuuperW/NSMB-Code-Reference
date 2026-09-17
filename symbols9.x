@@ -5333,6 +5333,8 @@ _ZN4Game11modelMatrixE						= 0x0208B6E8;
 _ZN4Game12wrapFunctionE						= 0x02039968;
 _ZN4Game10sceneTimerE						= 0x02088BD4;
 _ZN4Game10actorTimerE						= 0x02088BD8;
+_ZN4Game11actorTimer2E						= 0x020CAB14;
+_ZN4Game10igtDisplayE						= 0x020CA8B4;
 _ZN4Game6randomE							= 0x02085A70;
 _ZN4Game15randomCallCountE					= 0x02085A54;
 
@@ -6071,7 +6073,7 @@ _ZN6Player14crushRightWallEv								= 0x02101CBC;
 _ZN6Player15updateMainLogicEv								= 0x02101A94;
 _ZN6Player15applyTileDamageEv								= 0x02101968;
 _ZN6Player15switchMainStateEMS_FbPvES0_						= 0x021006AC;
-_ZN6Player15updateMainStateEv								= 0x02100558;
+_ZN6Player15updateMainStateEPv								= 0x02100558;
 _ZN6Player16setMovementStateEMS_FvvE						= 0x021004FC;
 _ZN6Player19updateMovementStateEv							= 0x021004B0;
 _ZN6Player12setMetaStateEMS_FvvE							= 0x0210045C;
@@ -8406,6 +8408,19 @@ _ZN9SnowSpike10rotationsYE								= 0x0217B8A4;
 
 _ZTV9SnowSpike											= 0x0217BAB4;
 
+/* arm9_ov89 */
+/*----------------------------------------------------------------*/
+/*---------------------------- seesaw ----------------------------*/
+/*----------------------------------------------------------------*/
+_ZN6SeeSawD0Ev                   = 0x0217e17c;
+_ZN6SeeSawD1Ev                   = 0x0217e0f0;
+_ZN6SeeSaw8onCreateEv            = 0x0217e2bc;
+_ZN6SeeSaw9onDestroyEv           = 0x0217e210;
+_ZN6SeeSaw8onRenderEv            = 0x0217e234;
+_ZN6SeeSaw18onPrepareResourcesEv = 0x0217e7f0;
+_ZN6SeeSaw10updateMainEv         = 0x0217e274;
+
+_ZTV6SeeSaw                      = 0x0217fbb4 - 8;
 
 /* arm9_ov97 */
 /*----------------------------------------------------------------*/
