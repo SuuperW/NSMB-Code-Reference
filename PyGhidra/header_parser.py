@@ -476,12 +476,12 @@ class ParseResults:
 			clang_type = node.type
 			cursor = node
 		
-		underlying = unelaborate(clang_type)
-		underlying_name = get_friendly_name(underlying)
+		clang_type = unelaborate(clang_type)
+		old_name = get_friendly_name(clang_type)
 		
-		if name != underlying_name:
-			if is_function_pointer(underlying) or underlying.kind == TypeKind.FUNCTIONPROTO:
-				underlying = get_base_type(underlying)
+		if name != old_name:
+			if is_function_pointer(clang_type) or clang_type.kind == TypeKind.FUNCTIONPROTO:
+				clang_type = get_base_type(clang_type)
 				param_names = []
 				param_types = []
 				if cursor is not None:
@@ -490,26 +490,26 @@ class ParseResults:
 						param_types.append(self.collect_type(arg.type))
 				else:
 					param_names = None
-					for arg in underlying.argument_types():
+					for arg in clang_type.argument_types():
 						param_types.append(self.collect_type(arg))
 				return FunctionTypedefInfo(
 					new_name = name,
 					param_names = param_names,
 					param_types = param_types,
-					return_type = self.collect_type(underlying.get_result()),
+					return_type = self.collect_type(clang_type.get_result()),
 				)
-			elif underlying.kind == TypeKind.MEMBERPOINTER:
-				return MemberPointerTypedefInfo(name, underlying_name, clang_type)
+			elif clang_type.kind == TypeKind.MEMBERPOINTER:
+				return MemberPointerTypedefInfo(name, old_name, clang_type)
 			else:
-				self.collect_type(underlying)
-				return TypedefInfo(name, underlying_name)
+				self.collect_type(clang_type)
+				return TypedefInfo(name, old_name)
 
-		if underlying.kind in (TypeKind.RECORD, TypeKind.ENUM):
+		if clang_type.kind in (TypeKind.RECORD, TypeKind.ENUM):
 			# this happens for typedef struct Foo {} Foo, since we remove 'struct '
-			self.collect_type(underlying)
+			self.collect_type(clang_type)
 			return None
 		else:
-			raise Exception(f'Unexpected same-name typedef {name} = {underlying.spelling}, {underlying.kind}')
+			raise Exception(f'Unexpected same-name typedef {name} = {clang_type.spelling}, {clang_type.kind}')
 	
 	def collect_type(self, node: Type, name_for_func: str | None = None) -> str:
 		"""Returns the friendly name of the given Type"""

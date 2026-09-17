@@ -247,14 +247,12 @@ class TypeGenerator:
 					None # comment
 				))
 		else:
-			i = 0
 			for arg in func_type.argument_types():
 				fp_args.append(ParameterDefinitionImpl(
 					None,
 					self.get_ghidra_type(arg),
 					None # comment
 				))
-				i += 1
 		
 		ghidra_func_type = FunctionDefinitionDataType(cat, name)
 		ghidra_func_type.setArguments(*fp_args)
@@ -327,7 +325,11 @@ class TypeGenerator:
 		class_name = get_friendly_name(clang_func_type.get_class_type())
 		clang_func_type = clang_func_type.get_pointee()
 		
-		func_type = self.create_function_type(f'{class_name}::{name}_func', clang_func_type)
+		func_type = self.create_function_type(
+			f'{class_name}::{name}_func',
+			clang_func_type,
+			self.type_manager.getPointer(self.get_ghidra_type(class_name)),
+		)
 		func_type.setCallingConvention(CompilerSpec.CALLING_CONVENTION_thiscall)
 		
 		# Struct for the member pointer
