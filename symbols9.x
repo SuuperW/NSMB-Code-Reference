@@ -5142,6 +5142,7 @@ _ZN5Stage9getAreaIDEhhh								= 0x0201f53c;
 
 _ZN5Stage6eventsE									= 0x0208af3c;
 _ZN5Stage13starToonTableE							= 0x02026290;
+_ZN5Stage13redBlockItemsE							= 0x0216c1b0;
 
 _ZN5Stage10playerDeadE								= 0x0208b328;
 _ZN5Stage14initialPowerupE							= 0x0208b324;
@@ -6748,11 +6749,89 @@ _ZN3End6slidesE = 0x020E4198;
 /*----------------------------- item -----------------------------*/
 /*----------------------------------------------------------------*/
 
+_ZN4ItemD0Ev                   = 0x020d0c64;
+_ZN4ItemD1Ev                   = 0x020d0be4;
+_ZN4Item8onCreateEv            = 0x020d141c;
+_ZN4Item9onDestroyEv           = 0x020d0d80;
+_ZN4Item8onUpdateEv            = 0x020d1378;
+_ZN4Item8onRenderEv            = 0x020d0da4;
+_ZN4Item18onCleanupResourcesEv = 0x020d0da0;
+_ZN4Item18onPrepareResourcesEv = 0x020d2248;
+_ZN4Item10onBlockHitEv         = 0x020d4de8;
+
 _ZN4Item11switchStateEMS_FbvE  = 0x020d4eb8;
 _ZN4Item12checkConsumeEv       = 0x020d475c;
-_ZN4Item18onPrepareResourcesEv = 0x020d2248;
 _ZN4Item14checkValidTileEv     = 0x020d4664;
 
+_ZTV4Item                      = 0x02124370 - 8;
+
+/* arm9_ov10 */
+/*----------------------------------------------------------------*/
+/*------------------------- stone block --------------------------*/
+/*----------------------------------------------------------------*/
+
+_ZN10StoneBlockD0Ev                          = 0x020dc660;
+_ZN10StoneBlockD1Ev                          = 0x020dc6e0;
+_ZN10StoneBlock8onCreateEv                   = 0x020dc774;
+_ZN10StoneBlock18onPrepareResourcesEv        = 0x020dc7b4;
+
+_ZTV10StoneBlock                             = 0x02125b80;
+
+_ZN20StoneBlockUpDownBaseD0Ev                = 0x020dc7dc;
+_ZN20StoneBlockUpDownBaseD1Ev                = 0x020dc878;
+_ZN20StoneBlockUpDownBase8onCreateEv         = 0x020dc99c;
+_ZN20StoneBlockUpDownBase9onDestroyEv        = 0x020dc90c;
+_ZN20StoneBlockUpDownBase8onRenderEv         = 0x020dc930;
+_ZN20StoneBlockUpDownBase10updateMainEv      = 0x020dc970;
+
+_ZTV20StoneBlockUpDownBase                   = 0x02125c9c;
+
+_ZN16StoneBlockUpDownD0Ev                    = 0x020dccf8;
+_ZN16StoneBlockUpDownD1Ev                    = 0x020dcc58;
+_ZN16StoneBlockUpDown8onCreateEv             = 0x020dcdc0;
+_ZN16StoneBlockUpDown10updateMainEv          = 0x020dcda0;
+
+_ZTV16StoneBlockUpDown                       = 0x02125dec;
+
+_ZN19StoneBlockLeftRightD0Ev                 = 0x020dd328;
+_ZN19StoneBlockLeftRightD1Ev                 = 0x020dd294;
+_ZN19StoneBlockLeftRight8onCreateEv          = 0x020dd5e8;
+_ZN19StoneBlockLeftRight9onDestroyEv         = 0x020dd474;
+_ZN19StoneBlockLeftRight8onRenderEv          = 0x020dd498;
+_ZN19StoneBlockLeftRight10updateMainEv       = 0x020dd4d8;
+_ZN19StoneBlockLeftRight10skipRenderEv       = 0x020dd3c4;
+
+_ZTV19StoneBlockLeftRight                    = 0x02125f48 - 8;
+_ZTV20StoneBlockLeftRight1                   = 0x02125f48 - 8;
+_ZTV20StoneBlockLeftRight2                   = 0x02125f48 - 8;
+
+
+/* arm9_ov11 */
+/*----------------------------------------------------------------*/
+/*-------------------------- hammer bro --------------------------*/
+/*----------------------------------------------------------------*/
+
+_ZN9HammerBroD0Ev                                             = 0x0215d2ac;
+_ZN9HammerBroD1Ev                                             = 0x0215d25c;
+_ZN9HammerBro8onCreateEv                                      = 0x0215d500;
+_ZN9HammerBro18onPrepareResourcesEv                           = 0x0215d6c4;
+_ZN9HammerBro10updateMainEv                                   = 0x0215d490;
+_ZN9HammerBro10onBlockHitEv                                   = 0x0215df58;
+_ZN9HammerBro11onEntityHitEv                                  = 0x0215df88;
+_ZN9HammerBro13onFireballHitEv                                = 0x0215dfd0;
+_ZN9HammerBro12onStarmanHitEv                                 = 0x0215dfa0;
+_ZN9HammerBro12onSlidingHitEv                                 = 0x0215dfb8;
+_ZN9HammerBro9onMegaHitEv                                     = 0x0215e0bc;
+_ZN9HammerBro9onStompedEv                                     = 0x0215e0d4;
+_ZN9HammerBro13onGroundPoundEv                                = 0x0215e0a4;
+_ZN9HammerBro14onBlueShellHitEv                               = 0x0215df70;
+_ZN9HammerBro17onMegaGroundPoundEv                            = 0x0215df10;
+_ZN9HammerBro15entityCollisionER14ActiveColliderR10StageActor = 0x0215e1ec;
+_ZN9HammerBro12damagePlayerER14ActiveColliderR6Player         = 0x0215e0ec;
+_ZN9HammerBro11preRender3DEv                                  = 0x0215d44c;
+_ZN9HammerBro12postRender3DEv                                 = 0x0215d304;
+
+_ZTV9HammerBro                                                = 0x0216E180 - 8;
 
 /* arm9_ov14 */
 /*----------------------------------------------------------------*/
@@ -6817,6 +6896,23 @@ _ZN10MegaGoomba13loadResourcesEv                        = 0x02132E4C;
 _ZN10MegaGoomba7profileE                                = 0x021330E8;
 
 _ZTV10MegaGoomba                                        = 0x021330FC - 8;
+
+
+/* arm9_ov20 */
+/*----------------------------------------------------------------*/
+/*--------------------- stone block special ----------------------*/
+/*----------------------------------------------------------------*/
+
+_ZN17StoneBlockSpecialD0Ev                   = 0x0212fa04;
+_ZN17StoneBlockSpecialD1Ev                   = 0x0212f900;
+_ZN17StoneBlockSpecial8onCreateEv            = 0x0212fec8;
+_ZN17StoneBlockSpecial9onDestroyEv           = 0x0212fc1c;
+_ZN17StoneBlockSpecial8onRenderEv            = 0x0212fc4c;
+_ZN17StoneBlockSpecial18onPrepareResourcesEv = 0x02131478;
+_ZN17StoneBlockSpecial10updateMainEv         = 0x0212fd38;
+_ZN17StoneBlockSpecial10skipRenderEv         = 0x0212fb58;
+
+_ZTV17StoneBlockSpecial                      = 0x021330a4 - 8;
 
 
 /* arm9_ov22 */
@@ -7283,10 +7379,20 @@ _ZN7Skeeter16getClosestPlayerEPlS0_                 = 0x021424fc;
 _ZN7Skeeter12doSkeetStateEv                         = 0x02142944;
 _ZN7Skeeter13dropBombStateEv                        = 0x02142568;
 
+_ZN7Skeeter8sDoSkeetE                               = 0x02143a80;
+_ZN7Skeeter9sDoSkeet2E                              = 0x02143a88;
+_ZN7Skeeter9sDoSkeet3E                              = 0x02143ab0;
+_ZN7Skeeter9sDoSkeet4E                              = 0x02143ab8;
+_ZN7Skeeter9sDoSkeet5E                              = 0x02143ac0;
+_ZN7Skeeter9sDoSkeet6E                              = 0x02143ad8;
+_ZN7Skeeter9sDoSkeet7E                              = 0x02143ae8;
+_ZN7Skeeter9sDropBombE                              = 0x02143aa0;
+_ZN7Skeeter10sDropBomb2E                            = 0x02143a90;
+
 _ZN7Skeeter20offscreenLungeSpeedsE                  = 0x02143a08;
 _ZN7Skeeter19onscreenLungeSpeedsE                   = 0x02143a00;
 
-_ZTV7Skeeter                                        = 0x02143afc;
+_ZTV7Skeeter                                        = 0x02143b04 - 8;
 
 
 /* arm9_ov36 */
@@ -8365,6 +8471,42 @@ _ZN8Splunkin7profileE											= 0x02179880;
 _ZTV8Splunkin													= 0x0217988C;
 
 
+/* arm9_ov79 */
+/*----------------------------------------------------------------*/
+/*---------------------------- unagi -----------------------------*/
+/*----------------------------------------------------------------*/
+
+_ZN5UnagiD0Ev                                     = 0x0217bbdc;
+_ZN5UnagiD1Ev                                     = 0x0217bcf8;
+_ZN5Unagi8onCreateEv                              = 0x02179ddc;
+_ZN5Unagi9onDestroyEv                             = 0x02179a54;
+_ZN5Unagi18onCleanupResourcesEv                   = 0x02179b20;
+_ZN5Unagi18onPrepareResourcesEv                   = 0x0217a78c;
+_ZN5Unagi10updateMainEv                           = 0x02179ca8;
+_ZN5Unagi10skipRenderEv                           = 0x021799c0;
+_ZN5Unagi14updateDefeatedEv                       = 0x0217a844;
+_ZN5Unagi10onBlockHitEv                           = 0x0217b74c;
+_ZN5Unagi13onFireballHitEv                        = 0x0217b750;
+_ZN5Unagi12onStarmanHitEv                         = 0x0217b728;
+_ZN5Unagi9onMegaHitEv                             = 0x0217b754;
+_ZN5Unagi14onBlueShellHitEv                       = 0x0217b704;
+_ZN5Unagi12damagePlayerER14ActiveColliderR6Player = 0x0217b7e0;
+_ZN5Unagi11preRender3DEv                          = 0x02179c78;
+_ZN5Unagi12postRender3DEv                         = 0x02179b24;
+
+_ZTV5Unagi                                        = 0x0217c1e0 - 8;
+
+
+/* arm9_ov79 */
+/*----------------------------------------------------------------*/
+/*-------------------------- mega unagi --------------------------*/
+/*----------------------------------------------------------------*/
+_ZN9MegaUnagiD0Ev = 0x0217c0a8;
+_ZN9MegaUnagiD1Ev = 0x0217c088;
+
+_ZTV9MegaUnagi    = 0x0217c2fc - 8;
+
+
 /* arm9_ov82 */
 /*----------------------------------------------------------------*/
 /*--------------------------- snowball ---------------------------*/
@@ -8574,6 +8716,25 @@ _ZN7Broozer7profileE									= 0x0218AEF0;
 
 _ZTV7Broozer											= 0x0218AEFC;
 
+/* arm9_ov110 */
+/*----------------------------------------------------------------*/
+/*----------------------- obstacle bubble ------------------------*/
+/*----------------------------------------------------------------*/
+_ZN14ObstacleBubbleD0Ev                                     = 0x02189a80;
+_ZN14ObstacleBubbleD1Ev                                     = 0x021899e0;
+_ZN14ObstacleBubble8onCreateEv                              = 0x02189c58;
+_ZN14ObstacleBubble8onRenderEv                              = 0x02189b28;
+_ZN14ObstacleBubble18onPrepareResourcesEv                   = 0x02189da8;
+_ZN14ObstacleBubble10updateMainEv                           = 0x02189c38;
+_ZN14ObstacleBubble10onBlockHitEv                           = 0x0218a3a4;
+_ZN14ObstacleBubble13onFireballHitEv                        = 0x0218a3a0;
+_ZN14ObstacleBubble12onStarmanHitEv                         = 0x0218a39c;
+_ZN14ObstacleBubble9onMegaHitEv                             = 0x0218a3ac;
+_ZN14ObstacleBubble9onStompedEv                             = 0x0218a3a8;
+_ZN14ObstacleBubble12damagePlayerER14ActiveColliderR6Player = 0x0218a3fc;
+
+_ZTV14ObstacleBubble                                        = 0x0218a814 - 8;
+
 /* arm9_ov116 */
 /*----------------------------------------------------------------*/
 /*--------------------------- snowbank ---------------------------*/
@@ -8757,6 +8918,21 @@ _ZN17SpikedBallTrigger10updateMainEv						= 0x0218DDE4;
 _ZN17SpikedBallTrigger7profileE								= 0x0218E1F0;
 
 _ZTV17SpikedBallTrigger										= 0x0218E1FC;
+
+
+/* arm9_ov123 */
+/*----------------------------------------------------------------*/
+/*-------------------------- toadsworth --------------------------*/
+/*----------------------------------------------------------------*/
+
+_ZN10ToadsworthD0Ev                   = 0x0218c7ec;
+_ZN10ToadsworthD1Ev                   = 0x0218c7c0;
+_ZN10Toadsworth8onCreateEv            = 0x0218c87c;
+_ZN10Toadsworth8onUpdateEv            = 0x0218c83c;
+_ZN10Toadsworth18onPrepareResourcesEv = 0x0218cb08;
+_ZN10Toadsworth12postRender3DEv       = 0x0218c820;
+
+_ZTV10Toadsworth                      = 0x0218F3FC - 8;
 
 
 /* arm9_ov5 */

@@ -33,10 +33,17 @@
 #include "stage/actors/ov10/koopatroopa.hpp"
 #include "stage/actors/ov10/spinblock.hpp"
 #include "stage/actors/ov10/stagefx.hpp"
+#include "stage/actors/ov10/stoneblock.hpp"
 #include "stage/actors/ov10/zoom.hpp"
+
+// Overlay 11 - HammerBro
+#include "stage/actors/ov11/hammerbro.hpp"
 
 // Overlay 14 - MegaGoomba
 #include "stage/actors/ov14/megagoomba.hpp"
+
+// Overlay 20 - StoneBlockSpecial
+#include "stage/actors/ov20/stoneblockspecial.hpp"
 
 // Overlay 22 - PipeEnemySpawner
 #include "stage/actors/ov22/pipeenemyspawner.hpp"
@@ -106,6 +113,10 @@
 #include "stage/actors/ov71/phantomhand.hpp"
 #include "stage/actors/ov71/splunkin.hpp"
 
+// Overlay 79 - Unagi, MegaUnagi
+#include "stage/actors/ov79/unagi.hpp"
+#include "stage/actors/ov79/megaunagi.hpp"
+
 // Overlay 82 - Snowball, SnowSpike
 #include "stage/actors/ov82/snowball.hpp"
 #include "stage/actors/ov82/snowspike.hpp"
@@ -121,6 +132,9 @@
 
 // Overlay 108 - Broozer
 #include "stage/actors/ov108/broozer.hpp"
+
+// Overlay 110 - Obstacle Bubble
+#include "stage/actors/ov110/obstaclebubble.hpp"
 
 // Overlay 116 - SnowBank
 #include "stage/actors/ov116/snowbank.hpp"

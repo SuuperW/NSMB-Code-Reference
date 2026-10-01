@@ -75,9 +75,21 @@ public:
 	// 02142568
 	bool dropBombState();
 
-	static const StateFunction sDoSkeet;
+	static constexpr ObjectClassID ObjectID = ObjectClassID::Skeeter;
 
-	static const StateFunction sDropBomb;
+	static constexpr u16 UpdatePriority = (u16)ObjectID;
+	static constexpr u16 RenderPriority = 102;
+
+	static const StateFunction sDoSkeet; // 02143a80
+	static const StateFunction sDoSkeet2; // 02143a88
+	static const StateFunction sDoSkeet3; // 02143ab0
+	static const StateFunction sDoSkeet4; // 02143ab8
+	static const StateFunction sDoSkeet5; // 02143ac0
+	static const StateFunction sDoSkeet6; // 02143ad8
+	static const StateFunction sDoSkeet7; // 02143ae8
+
+	static const StateFunction sDropBomb; // 02143aa0
+	static const StateFunction sDropBomb2; // 02143a90
 
 	// 02143a08
 	static fx32 offscreenLungeSpeeds[2]; // positive and negative

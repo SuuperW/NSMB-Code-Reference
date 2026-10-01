@@ -67,7 +67,6 @@ enum class ItemType : u16
 	MegaMushroomCard
 };
 
-
 enum class ItemSpawnBehaviour : u32
 {
 	ItemOut,
@@ -82,12 +81,37 @@ enum class ItemSpawnBehaviour : u32
 
 class Toadsworth;
 
-
+// vtable at 02124370 (ov10)
 class Item : public StageEntity
 {
 public:
 
 	typedef bool(Item::*StateFunction)();
+
+	// D0: 020d0c64
+	// D1: 020d0be4
+	virtual ~Item();
+
+	// 020d141c
+	virtual s32 onCreate() override;
+
+	// 020d0d80
+	virtual s32 onDestroy() override;
+
+	// 020d1378
+	virtual s32 onUpdate() override;
+
+	// 020d0da4
+	virtual s32 onRender() override;
+
+	// 020d0da0
+	virtual void onCleanupResources() override;
+
+	// 020d2248
+	virtual bool onPrepareResources() override;
+
+	// 020d4de8
+	virtual void onBlockHit() override;
 
 	//020d475c
 	bool checkConsume();                // returns true if the item has been consumed by a player, false otherwise
@@ -98,7 +122,6 @@ public:
 	//020d4eb8
 	bool switchState(StateFunction function);    //Switches the state function to function. Always returns true.
 
-	bool onPrepareResources();
 
 	static constexpr ObjectClassID ObjectID = ObjectClassID::Item;
 

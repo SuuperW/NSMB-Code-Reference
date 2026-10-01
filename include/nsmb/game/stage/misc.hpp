@@ -2,6 +2,7 @@
 
 #include "layout/stagelayout.hpp"
 #include "layout/data.hpp"
+#include "actors/ov10/enemyItem.hpp"
 #include <nsmb/core/net/util.hpp>
 
 enum class CollisionType : u32;
@@ -113,6 +114,9 @@ namespace Stage
 
 	// 02026290
 	extern const GXRgb starToonTable[32];
+
+	// 0216c1b0
+	extern const EnemyItem redBlockItems[2][10];
 
 
 	NTR_INLINE bool getEvent(u8 id) {

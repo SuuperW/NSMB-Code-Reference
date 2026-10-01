@@ -2,9 +2,27 @@
 
 #include <nsmb/game/stage/entity3danm.hpp>
 
+// vtable at 0218F3FC (ov123)
 class Toadsworth : public StageEntity3DAnm
 {
 public:
+
+	// D0: 0218c7ec
+	// D1: 0218c7c0
+	virtual ~Toadsworth();
+
+	// 0218c87c
+	virtual s32 onCreate() override;
+
+	// 0218c83c
+	virtual s32 onUpdate() override;
+
+	// 0218cb08
+	virtual bool onPrepareResources() override;
+
+	// 0218c820
+	virtual void postRender3D() override;
+
 
 	typedef bool(Toadsworth::*StateFunction)();
 
