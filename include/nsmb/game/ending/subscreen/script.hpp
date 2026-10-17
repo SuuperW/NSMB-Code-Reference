@@ -8,238 +8,235 @@ namespace End {
 
 	using CharT = u8;
 
-
 	namespace Script {
-
-		// 0202A4CC
-		extern const CharT* s0;
-		// 0202A760
-		extern const CharT* s1;
-		// 0202A58C
-		extern const CharT* s2;
-		// 0202A2BC
-		extern const CharT* s3;
-		// 0202A63C
-		extern const CharT* s4;
-		// 0202A2B0
-		extern const CharT* s5;
-		// 0202A64C
-		extern const CharT* s6;
-		// 0202A990
-		extern const CharT* s7;
-		// 0202A88C
-		extern const CharT* s8;
-		// 0202A3A0
-		extern const CharT* s9;
-		// 0202A92C
-		extern const CharT* s10;
-		// 0202A878
-		extern const CharT* s11;
-		// 0202A8A0
-		extern const CharT* s12;
-		// 0202A940
-		extern const CharT* s13;
-		// 0202A42C
-		extern const CharT* s14;
-		// 0202A5EC
-		extern const CharT* s15;
-		// 0202A67C
-		extern const CharT* s16;
-		// 0202A66C
-		extern const CharT* s17;
-		// 0202A68C
-		extern const CharT* s18;
-		// 0202A7B0
-		extern const CharT* s19;
-		// 0202A788
-		extern const CharT* s20;
-		// 0202A44C
-		extern const CharT* s21;
-		// 0202A79C
-		extern const CharT* s22;
-		// 0202A69C
-		extern const CharT* s23;
-		// 0202A40C
-		extern const CharT* s24;
-		// 0202A5AC
-		extern const CharT* s25;
-		// 0202A4AC
-		extern const CharT* s26;
-		// 0202A6AC
-		extern const CharT* s27;
-		// 0202A4DC
-		extern const CharT* s28;
-		// 0202A5CC
-		extern const CharT* s29;
-		// 0202A2EC
-		extern const CharT* s30;
-		// 0202A3CC
-		extern const CharT* s31;
-		// 0202A8DC
-		extern const CharT* s32;
-		// 0202A4FC
-		extern const CharT* s33;
-		// 0202A46C
-		extern const CharT* s34;
-		// 0202A50C
-		extern const CharT* s35;
-		// 0202A388
-		extern const CharT* s36;
-		// 0202A7C4
-		extern const CharT* s37;
-		// 0202A5DC
-		extern const CharT* s38;
-		// 0202A48C
-		extern const CharT* s39;
-		// 0202A6D4
-		extern const CharT* s40;
-		// 0202A9B8
-		extern const CharT* s41;
-		// 0202A6E8
-		extern const CharT* s42;
-		// 0202A6FC
-		extern const CharT* s43;
-		// 0202A7EC
-		extern const CharT* s44;
-		// 0202A2E0
-		extern const CharT* s45;
-		// 0202A8F0
-		extern const CharT* s46;
-		// 0202A5FC
-		extern const CharT* s47;
-		// 0202A800
-		extern const CharT* s48;
-		// 0202A45C
-		extern const CharT* s49;
-		// 0202A814
-		extern const CharT* s50;
-		// 0202A710
-		extern const CharT* s51;
-		// 0202A47C
-		extern const CharT* s52;
-		// 0202A724
-		extern const CharT* s53;
-		// 0202A828
-		extern const CharT* s54;
-		// 0202A83C
-		extern const CharT* s55;
-		// 0202A60C
-		extern const CharT* s56;
-		// 0202A370
-		extern const CharT* s57;
-		// 0202A31C
-		extern const CharT* s58;
-		// 0202A850
-		extern const CharT* s59;
-		// 0202A864
-		extern const CharT* s60;
-		// 0202A738
-		extern const CharT* s61;
-		// 0202A37C
-		extern const CharT* s62;
-		// 0202A54C
-		extern const CharT* s63;
-		// 0202A61C
-		extern const CharT* s64;
-		// 0202A49C
-		extern const CharT* s65;
-		// 0202A904
-		extern const CharT* s66;
-		// 0202A55C
-		extern const CharT* s67;
-		// 0202A968
-		extern const CharT* s68;
-		// 0202A62C
-		extern const CharT* s69;
-		// 0202A4BC
-		extern const CharT* s70;
-		// 0202A57C
-		extern const CharT* s71;
-		// 0202A328
-		extern const CharT* s72;
-		// 0202A290
-		extern const CharT* s73;
-		// 0202A2D4
-		extern const CharT* s74;
-		// 0202A3FC
-		extern const CharT* s75;
-		// 0202A7D8
-		extern const CharT* s76;
-		// 0202A43C
-		extern const CharT* s77;
-		// 0202A298
-		extern const CharT* s78;
-		// 0202A774
-		extern const CharT* s79;
-		// 0202A97C
-		extern const CharT* s80;
-		// 0202A56C
-		extern const CharT* s81;
-		// 0202A65C
-		extern const CharT* s82;
-		// 0202A310
-		extern const CharT* s83;
-		// 0202A41C
-		extern const CharT* s84;
-		// 0202A2C8
-		extern const CharT* s85;
-		// 0202A8B4
-		extern const CharT* s86;
-		// 0202A9A4
-		extern const CharT* s87;
-		// 0202A340
-		extern const CharT* s88;
-		// 0202A8C8
-		extern const CharT* s89;
-		// 0202A5BC
-		extern const CharT* s90;
-		// 0202A59C
-		extern const CharT* s91;
-		// 0202A2A0
-		extern const CharT* s92;
-		// 0202A4EC
-		extern const CharT* s93;
-		// 0202A954
-		extern const CharT* s94;
-		// 0202A2F8
-		extern const CharT* s95;
-		// 0202A6C0
-		extern const CharT* s96;
-		// 0202A9D0
-		extern const CharT* s97;
-		// 0202A394
-		extern const CharT* s98;
-		// 0202A358
-		extern const CharT* s99;
-		// 0202A34C
-		extern const CharT* s100;
-		// 0202A51C
-		extern const CharT* s101;
-		// 0202A52C
-		extern const CharT* s102;
-		// 0202A3AC
-		extern const CharT* s103;
-		// 0202A3BC
-		extern const CharT* s104;
-		// 0202A364
-		extern const CharT* s105;
-		// 0202A53C
-		extern const CharT* s106;
-		// 0202A28C
-		extern const CharT* s107;
-		// 0202A304
-		extern const CharT* s108;
-		// 0202A3DC
-		extern const CharT* s109;
-		// 0202A334
-		extern const CharT* s110;
-		// 0202A74C
-		extern const CharT* s111;
-		// 0202A918
-		extern const CharT* s112;
-		// 0202A3EC
-		extern const CharT* s113;
-
+		// 020E9E8C
+		extern const CharT s0[];
+		// 020EA120
+		extern const CharT s1[];
+		// 020E9F4C
+		extern const CharT s2[];
+		// 020E9C7C
+		extern const CharT s3[];
+		// 020E9FFC
+		extern const CharT s4[];
+		// 020E9C70
+		extern const CharT s5[];
+		// 020EA00C
+		extern const CharT s6[];
+		// 020EA350
+		extern const CharT s7[];
+		// 020EA24C
+		extern const CharT s8[];
+		// 020E9D60
+		extern const CharT s9[];
+		// 020EA2EC
+		extern const CharT s10[];
+		// 020EA238
+		extern const CharT s11[];
+		// 020EA260
+		extern const CharT s12[];
+		// 020EA300
+		extern const CharT s13[];
+		// 020E9DEC
+		extern const CharT s14[];
+		// 020E9FAC
+		extern const CharT s15[];
+		// 020EA03C
+		extern const CharT s16[];
+		// 020EA02C
+		extern const CharT s17[];
+		// 020EA04C
+		extern const CharT s18[];
+		// 020EA170
+		extern const CharT s19[];
+		// 020EA148
+		extern const CharT s20[];
+		// 020E9E0C
+		extern const CharT s21[];
+		// 020EA15C
+		extern const CharT s22[];
+		// 020EA05C
+		extern const CharT s23[];
+		// 020E9DCC
+		extern const CharT s24[];
+		// 020E9F6C
+		extern const CharT s25[];
+		// 020E9E6C
+		extern const CharT s26[];
+		// 020EA06C
+		extern const CharT s27[];
+		// 020E9E9C
+		extern const CharT s28[];
+		// 020E9F8C
+		extern const CharT s29[];
+		// 020E9CAC
+		extern const CharT s30[];
+		// 020E9D8C
+		extern const CharT s31[];
+		// 020EA29C
+		extern const CharT s32[];
+		// 020E9EBC
+		extern const CharT s33[];
+		// 020E9E2C
+		extern const CharT s34[];
+		// 020E9ECC
+		extern const CharT s35[];
+		// 020E9D48
+		extern const CharT s36[];
+		// 020EA184
+		extern const CharT s37[];
+		// 020E9F9C
+		extern const CharT s38[];
+		// 020E9E4C
+		extern const CharT s39[];
+		// 020EA094
+		extern const CharT s40[];
+		// 020EA378
+		extern const CharT s41[];
+		// 020EA0A8
+		extern const CharT s42[];
+		// 020EA0BC
+		extern const CharT s43[];
+		// 020EA1AC
+		extern const CharT s44[];
+		// 020E9CA0
+		extern const CharT s45[];
+		// 020EA2B0
+		extern const CharT s46[];
+		// 020E9FBC
+		extern const CharT s47[];
+		// 020EA1C0
+		extern const CharT s48[];
+		// 020E9E1C
+		extern const CharT s49[];
+		// 020EA1D4
+		extern const CharT s50[];
+		// 020EA0D0
+		extern const CharT s51[];
+		// 020E9E3C
+		extern const CharT s52[];
+		// 020EA0E4
+		extern const CharT s53[];
+		// 020EA1E8
+		extern const CharT s54[];
+		// 020EA1FC
+		extern const CharT s55[];
+		// 020E9FCC
+		extern const CharT s56[];
+		// 020E9D30
+		extern const CharT s57[];
+		// 020E9CDC
+		extern const CharT s58[];
+		// 020EA210
+		extern const CharT s59[];
+		// 020EA224
+		extern const CharT s60[];
+		// 020EA0F8
+		extern const CharT s61[];
+		// 020E9D3C
+		extern const CharT s62[];
+		// 020E9F0C
+		extern const CharT s63[];
+		// 020E9FDC
+		extern const CharT s64[];
+		// 020E9E5C
+		extern const CharT s65[];
+		// 020EA2C4
+		extern const CharT s66[];
+		// 020E9F1C
+		extern const CharT s67[];
+		// 020EA328
+		extern const CharT s68[];
+		// 020E9FEC
+		extern const CharT s69[];
+		// 020E9E7C
+		extern const CharT s70[];
+		// 020E9F3C
+		extern const CharT s71[];
+		// 020E9CE8
+		extern const CharT s72[];
+		// 020E9C50
+		extern const CharT s73[];
+		// 020E9C94
+		extern const CharT s74[];
+		// 020E9DBC
+		extern const CharT s75[];
+		// 020EA198
+		extern const CharT s76[];
+		// 020E9DFC
+		extern const CharT s77[];
+		// 020E9C58
+		extern const CharT s78[];
+		// 020EA134
+		extern const CharT s79[];
+		// 020EA33C
+		extern const CharT s80[];
+		// 020E9F2C
+		extern const CharT s81[];
+		// 020EA01C
+		extern const CharT s82[];
+		// 020E9CD0
+		extern const CharT s83[];
+		// 020E9DDC
+		extern const CharT s84[];
+		// 020E9C88
+		extern const CharT s85[];
+		// 020EA274
+		extern const CharT s86[];
+		// 020EA364
+		extern const CharT s87[];
+		// 020E9D00
+		extern const CharT s88[];
+		// 020EA288
+		extern const CharT s89[];
+		// 020E9F7C
+		extern const CharT s90[];
+		// 020E9F5C
+		extern const CharT s91[];
+		// 020E9C60
+		extern const CharT s92[];
+		// 020E9EAC
+		extern const CharT s93[];
+		// 020EA314
+		extern const CharT s94[];
+		// 020E9CB8
+		extern const CharT s95[];
+		// 020EA080
+		extern const CharT s96[];
+		// 020EA390
+		extern const CharT s97[];
+		// 020E9D54
+		extern const CharT s98[];
+		// 020E9D18
+		extern const CharT s99[];
+		// 020E9D0C
+		extern const CharT s100[];
+		// 020E9EDC
+		extern const CharT s101[];
+		// 020E9EEC
+		extern const CharT s102[];
+		// 020E9D6C
+		extern const CharT s103[];
+		// 020E9D7C
+		extern const CharT s104[];
+		// 020E9D24
+		extern const CharT s105[];
+		// 020E9EFC
+		extern const CharT s106[];
+		// 020E9C4C
+		extern const CharT s107[];
+		// 020E9CC4
+		extern const CharT s108[];
+		// 020E9D9C
+		extern const CharT s109[];
+		// 020E9CF4
+		extern const CharT s110[];
+		// 020EA10C
+		extern const CharT s111[];
+		// 020EA2D8
+		extern const CharT s112[];
+		// 020E9DAC
+		extern const CharT s113[];
 	}
 
 

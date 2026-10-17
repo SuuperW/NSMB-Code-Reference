@@ -97,7 +97,7 @@ class TypeGenerator:
 			self.create_enum(name, parse_results.enums[name])
 		for name in parse_results.classes:
 			self.create_empty_struct(name, parse_results.classes[name].is_union)
-		# including typedefs and member pointer structs
+		# Step 1b: typedefs and member pointer structs are also needed early
 		self.done_typedefs = set()
 		skipped_typedefs = []
 		for name in parse_results.typedefs:
@@ -113,6 +113,12 @@ class TypeGenerator:
 			skipped_typedefs = st
 		for name in parse_results.function_member_pointers:
 			self.create_function_member_pointer(name, parse_results.function_member_pointers[name])
+		
+		# Step 1c: Single-byte types should be Ghidra's "byte" types, not "char" so that related constants show as numbers instead of characters in decompilation window
+		numeric_u8 = TypedefDataType("u8", self.type_manager.getDataType('/byte'))
+		self.type_manager.addDataType(numeric_u8, conflict_handler)
+		numeric_s8 = TypedefDataType("s8", self.type_manager.getDataType('/sbyte'))
+		self.type_manager.addDataType(numeric_s8, conflict_handler)
 
 		# Step 2: Populate the structs and make vtables
 		self.done_structs = set()
@@ -142,6 +148,8 @@ class TypeGenerator:
 	def add_builtin_types(self):
 		bdtm = BuiltInDataTypeManager.getDataTypeManager()
 		cat = CategoryPath('/')
+		self.type_manager.addDataType(bdtm.getDataType('/byte'), conflict_handler)
+		self.type_manager.addDataType(bdtm.getDataType('/sbyte'), conflict_handler)
 		self.type_manager.addDataType(bdtm.getDataType('/uchar'), conflict_handler)
 		self.type_manager.addDataType(bdtm.getDataType('/schar'), conflict_handler)
 		self.type_manager.addDataType(bdtm.getDataType('/char'), conflict_handler)
@@ -770,14 +778,28 @@ class SymbolGenerator:
 			# If there are other symbols that we made, that's OK as long as the data types match.
 			existing_data_type: DataType | None = None
 			for s in symbols:
-				if s.getName(True) == plain_name:
-					return
+				name_match = s.getName(True) == plain_name
+				incompatible_type = False
 				if s.getSource() == SourceType.USER_DEFINED:
 					if existing_data_type is None:
-						existing_data_type = self.listing.getDataAt(address).getDataType()
+						existing_data = self.listing.getDataAt(address)
+						if existing_data is None:
+							continue
+						existing_data_type = existing_data.getDataType()
 					# Instances may be different even when the types are the same.
 					if existing_data_type.getPathName() != ghidra_type.getPathName():
-						raise Exception(f'Cannot have two different data types at the same address. {s.getName(True)} exists with {existing_data_type.getPathName()} at {address} and we tried to make {plain_name} with {ghidra_type.getPathName()}.')
+						incompatible_type = True
+				if name_match:
+					if incompatible_type:
+						# we probably updated the type in the source
+						s.delete()
+						existing_data_type = None
+					else:
+						# same type, nothing to do
+						return
+				elif incompatible_type:
+					raise Exception(f'Cannot have two different data types at the same address. {s.getName(True)} exists with {existing_data_type.getPathName()} at {address} and we tried to make {plain_name} with {ghidra_type.getPathName()}.')
+					
 			# If the only symbol is a default symbol, it will be overwritten.
 			self.symbol_table.createLabel(address, sname, space, SourceType.USER_DEFINED)
 			if existing_data_type is None:
