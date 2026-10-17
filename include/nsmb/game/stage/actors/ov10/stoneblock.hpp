@@ -101,7 +101,14 @@ public:
 
 	int unknown_4bc[4];
 	Collider collider;
-	int unknown_538[12];
+	int unknown_538[4];
+	fx32 width;
+	fx32 positionOffset;
+	fx32 endpoints[2]; // start, end
+	int unknown_558[2];
+	fx16 maximumSpeed;
+	short unknown_562;
+	int unknown_564;
 
 };
 NTR_SIZE_GUARD(StoneBlockLeftRight, 0x568);

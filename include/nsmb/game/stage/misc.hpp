@@ -46,8 +46,20 @@ namespace Stage
 	// 020cae1c
 	extern fx32 cameraX[2];
 
+	// 0212ad18
+	extern fx32 cameraOffsetX[2];
+
+	// 020cadcc
+	extern fx32 cameraXnoOffset[2];
+
 	// 020cad94
 	extern fx32 cameraY[2];
+
+	// 0212ad20
+	extern fx32 cameraOffsetY[2];
+
+	// 020cadd4
+	extern fx32 cameraYnoOffset[2];
 
 	// 020cadb4
 	extern fx32 cameraScale[2];
@@ -117,6 +129,9 @@ namespace Stage
 
 	// 0216c1b0
 	extern const EnemyItem redBlockItems[2][10];
+
+	// 020ca3cc
+	extern const u8 objectSpawnFlags[256];
 
 
 	NTR_INLINE bool getEvent(u8 id) {

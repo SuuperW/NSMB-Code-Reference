@@ -121,7 +121,7 @@ public:
 	fx32 homePositionX;
 
 	u32 punchSoundTimer;
-	u16 searchRange;
+	s16 searchRange;
 	u16 searchRangeTimer;
 	u16 unused50C;
 	u16 turningFlag;

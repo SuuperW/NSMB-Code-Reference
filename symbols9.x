@@ -5152,7 +5152,11 @@ _ZN5Stage13storedPowerupE							= 0x0208b32c;
 _ZN5Stage14liquidPositionE							= 0x020cae0c;
 _ZN5Stage18lastLiquidPositionE						= 0x020cadac;
 _ZN5Stage7cameraXE									= 0x020cae1c;
+_ZN5Stage13cameraOffsetXE							= 0x0212ad18;
+_ZN5Stage15cameraXnoOffsetE							= 0x020cadcc;
 _ZN5Stage7cameraYE									= 0x020cad94;
+_ZN5Stage13cameraOffsetYE							= 0x0212ad20;
+_ZN5Stage15cameraYnoOffsetE							= 0x020cadd4;
 _ZN5Stage11cameraScaleE                             = 0x020cadb4;
 _ZN5Stage11cameraWidthE								= 0x020cada4;
 _ZN5Stage12cameraHeightE							= 0x020cad8c;
@@ -5172,6 +5176,7 @@ _ZN5Stage23phantomHandsDisableMaskE					= 0x020ca8b0;
 _ZN5Stage18phantomHandsTargetE						= 0x020ca918;
 _ZN5Stage16spawnStageObjectEmmPK4Vec3				= 0x0209c178;
 _ZN5Stage13objectIDTableE 							= 0x020c22b8;
+_ZN5Stage16objectSpawnFlagsE						= 0x020ca3cc;
 
 /* arm9_ov10 */
 _ZN5Stage7setZoomElmhh								= 0x020facfc;
