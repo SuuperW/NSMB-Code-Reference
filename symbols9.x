@@ -4878,6 +4878,28 @@ _ZTV7Actor22			= 0x02126BEC;
 
 /* arm9_ov10 */
 /*----------------------------------------------------------------*/
+/*------------------------- broken brick -------------------------*/
+/*----------------------------------------------------------------*/
+
+_ZN11BrokenBrickD1Ev                     = 0x020d5240;
+_ZN11BrokenBrickD0Ev                     = 0x020d52c8;
+_ZN11BrokenBrick8onCreateEv              = 0x020d5400;
+_ZN11BrokenBrick9onDestroyEv             = 0x020d5358;
+_ZN11BrokenBrick8onUpdateEv              = 0x020d5398;
+_ZN11BrokenBrick8onRenderEv              = 0x020d5390;
+_ZN11BrokenBrick18onCleanupResourcesEv   = 0x020d538c;
+_ZN11BrokenBrick10onBlockHitEv           = 0x020d56dc;
+
+_ZN11BrokenBrick11switchStateEMS_FbiEi   = 0x020d5750;
+_ZN11BrokenBrick12defaultStateEi         = 0x020d561c;
+
+_ZN11BrokenBrick7profileE                = 0x021245a8;
+
+_ZTV11BrokenBrick                        = 0x021245bc;
+
+
+/* arm9_ov10 */
+/*----------------------------------------------------------------*/
 /*------------------------ line controller -----------------------*/
 /*----------------------------------------------------------------*/
 

@@ -27,6 +27,7 @@
 
 // Overlay 10 - Coin, Goomba, MiniGoomba, Paragoomba, KoopaTroopa, Item, SpinBlock, etc.
 #include "stage/actors/ov10/actor22.hpp"
+#include "stage/actors/ov10/brokenbrick.hpp"
 #include "stage/actors/ov10/coin.hpp"
 #include "stage/actors/ov10/goomba.hpp"
 #include "stage/actors/ov10/item.hpp"

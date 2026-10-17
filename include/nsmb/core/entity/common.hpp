@@ -123,6 +123,7 @@ enum class ObjectClassID : u16 {
 	Trampoline = 237,
 	BanzaiBill = 238,
 	MegaGoomba = 239,
+	BrokenBrick = 241,
 	BulletBillBlaster = 248,
 	BanzaiBillBlaster = 249,
 	SpinBlock = 254,
