@@ -3,6 +3,7 @@
 #include "layout/stagelayout.hpp"
 #include "layout/data.hpp"
 #include "actors/ov10/enemyItem.hpp"
+#include <nsmb/core/entity/scene.hpp>
 #include <nsmb/core/net/util.hpp>
 
 enum class CollisionType : u32;
@@ -33,6 +34,15 @@ enum class ChallengeMode : u8 {
 
 namespace Stage
 {
+	enum class ExitFlag : u8 {
+
+		None = 0,
+		LevelBeaten = 1,
+		MushroomHouse = 2,
+		ReturnToMap = 4,
+		WarpCannon = 8,
+
+	};
 
 	// 020cae0c
 	extern fx32 liquidPosition[2];
@@ -175,6 +185,21 @@ namespace Stage
 	// 0201f53c
 	u32 getAreaID(u8 group, u8 stage, u8 act);
 
+	// 020A189C
+	void exitLevel(ExitFlag flag = ExitFlag::None);
+
+	// 020A183C
+	void switchScene(u16 sceneID, u32 settings = 0);
+
+	NTR_INLINE static void switchScene(SceneID sceneID, u32 settings = 0) {
+		switchScene(u16(sceneID), settings);
+	}
+
+	template<class T>
+	NTR_INLINE static void switchScene(u32 settings = 0) {
+		switchScene(T::ObjectID, settings);
+	}
+
 	// Used in stage related operations (actor spawning, tile randomization)
 
 	NTR_INLINE s32 getRandom(s32 max) {
@@ -210,3 +235,5 @@ namespace Stage
 	extern const u16 objectIDTable[326];
 
 }
+
+NTR_CREATE_BITMASK_ENUM(Stage::ExitFlag);

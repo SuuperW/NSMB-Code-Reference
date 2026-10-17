@@ -5161,6 +5161,8 @@ _ZTV7StageFX							= 0x02127838;
 _ZN5Stage20challengeModeEnabledE					= 0x02085a10;
 _ZN5Stage13challengeModeE							= 0x02085a60;
 _ZN5Stage9getAreaIDEhhh								= 0x0201f53c;
+_ZN5Stage9exitLevelENS_8ExitFlagE					= 0x020A189C;
+_ZN5Stage11switchSceneEtm							= 0x020A183C;
 
 _ZN5Stage6eventsE									= 0x0208af3c;
 _ZN5Stage13starToonTableE							= 0x02026290;
